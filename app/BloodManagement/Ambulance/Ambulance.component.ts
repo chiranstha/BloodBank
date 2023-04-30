@@ -3,6 +3,7 @@ import { FormGroup, FormBuilder, Validators, AbstractControl } from '@angular/fo
 import { AmbulancesServiceProxy } from '@shared/service-proxies/service-proxies';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { finalize, Subject, takeUntil } from 'rxjs';
+import { threadId } from 'worker_threads';
 
 @Component({
   selector: 'app-Ambulance',
@@ -19,12 +20,19 @@ export class AmbulanceComponent implements OnInit {
   saving = false;
   notify: any;
   emptyguId: any;
+  filterText: any;
+  sorting: any;
+  skipCount: any;
+  itemSize: any;
+  totalCount: any;
+  AmbulanceData: any;
   public destroy$ = new Subject<void>();
     constructor(private modalService: BsModalService,    private fb: FormBuilder,
       private _proxy:AmbulancesServiceProxy) { }
   
     ngOnInit() {
       this.createForm();
+      this.getAmbulanceData();
     }
   
     createForm(item: any = {}) {
@@ -49,28 +57,20 @@ export class AmbulanceComponent implements OnInit {
               finalize(() => (this.saving = false))
           )
           .subscribe((data) => {
-      
+            this.modalRef.hide();
                   this.notify.success('Saved Successfully');
-                  this.modalRef.hide();
+            
               
           });
   }
-  //   save() {
-  //     if (this.form.valid) {
-
-  //       this._proxy.createOrEdit(this.form.getRawValue()).subscribe(() => {
-  //         this.active = false;
-  //         this.saving = false;
-  //         this.form.reset();
-  //         this.modalRef.hide();
-  //         this.modalRef.onHide.emit(null);
-  //         // this.notify.success('Saved Successfully' + res);
-  //         // this.router.navigate(['/app/main/EnterpreneurAssessment/', res ]);
-  //       });
-  //     } else {
-  //       this.saving = false;
-  //       this.notify.error('Form is invalid!!');
-  //     }
+  // edit(template: TemplateRef<any>, id: number) {
+  //   this.modalRef = this.modalService.show(
+  //     template,
+  //     Object.assign({}, { class: 'gray modal-lg' })
+  //   );
+  //   this._proxy.getAmbulanceForEdit(id).subscribe(res=>{
+  //     this.createForm(res);
+  //   });
   // }
     openModalWithClass(template: TemplateRef<any>) {
       this.modalRef = this.modalService.show(
@@ -88,6 +88,14 @@ export class AmbulanceComponent implements OnInit {
       }
       Back(){
         this.modalRef.hide();
+      }
+
+      delete(){}
+      getAmbulanceData(){
+        this._proxy.getAll(this.filterText, this.sorting, this.skipCount, this.itemSize).subscribe(res => {
+          this.totalCount = res.totalCount;
+          this.AmbulanceData = res.items;
+        })
       }
   }
   

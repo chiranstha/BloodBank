@@ -63,7 +63,7 @@ import { ChangePasswordComponent } from './users/change-password/change-password
                         loadChildren: () => import('./bloodMgt/bloodStocks/bloodStock.module').then(m => m.BloodStockModule),
                         data: { permission: 'Pages.BloodStocks' }
                     },
-
+                   
                     {
                         path: 'bloodBank',
                         loadChildren: () => import('./BloodManagement/Bloodbank/Bloodbank.module').then(m => m.BloodbankModule),
