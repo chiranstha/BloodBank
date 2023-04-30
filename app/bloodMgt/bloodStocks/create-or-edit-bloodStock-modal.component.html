@@ -1,0 +1,66 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #bloodStockForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="bloodStock.id">{{l("EditBloodStock")}}</span>
+                        <span *ngIf="!bloodStock.id">{{l("CreateNewBloodStock")}}</span>
+                    </h4>
+
+
+                 <button type="button" class="btn-close" (click)="close()" aria-label="Close" [disabled]="saving"></button>
+
+                </div>
+                <div class="modal-body">
+
+
+
+
+
+								<div class="my-3">
+									<label class="form-label" for="BloodStock_BloodGroup">{{l("BloodGroup")}}</label>
+									<select class="form-select" #BloodStock_BloodGroup="ngModel" name="BloodGroup" id="BloodStock_BloodGroup" [(ngModel)]="bloodStock.bloodGroup" >
+									<option value="0">{{l('APos')}}</option>
+
+									<option value="1">{{l('ANeg')}}</option>
+
+									<option value="2">{{l('BPos')}}</option>
+
+									<option value="3">{{l('BNeg')}}</option>
+
+									<option value="4">{{l('ABPos')}}</option>
+
+									<option value="5">{{l('ABNeg')}}</option>
+
+									<option value="6">{{l('OPos')}}</option>
+
+									<option value="7">{{l('ONeg')}}</option>
+
+
+									</select>
+								</div>
+
+								<div class="my5">
+									<label class="form-label" for="BloodStock_InwardQty">{{l("InwardQty")}}</label>
+									<input type="number" #BloodStock_InwardQty="ngModel" id="BloodStock_InwardQty" class="form-control" [(ngModel)]="bloodStock.inwardQty" name="InwardQty"   />
+
+								</div>
+
+								<div class="my5">
+									<label class="form-label" for="BloodStock_OutwardQty">{{l("OutwardQty")}}</label>
+									<input type="number" #BloodStock_OutwardQty="ngModel" id="BloodStock_OutwardQty" class="form-control" [(ngModel)]="bloodStock.outwardQty" name="OutwardQty"   />
+
+								</div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!bloodStockForm.form.valid"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

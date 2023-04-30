@@ -1,0 +1,163 @@
+﻿<div [@routerTransition]>
+
+  <div class="content d-flex flex-column flex-column-fluid">
+   <div class="row">
+             <div role="actions">
+                 <button (click)="exportToExcel()" class="btn btn-outline btn-outline-success btn-active-light-success me-1"><i class="fa fa-file-excel"></i> {{l("ExportToExcel")}}</button>
+
+                 <button *ngIf="isGranted('Pages.BloodBanks.Create')" (click)="createBloodBank()"
+                                        class="btn btn-primary blue"><i class="fa fa-plus"></i> {{l("CreateNewBloodBank")}}</button>
+             </div>
+            </div>
+
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <form class="form" autocomplete="off">
+                    <div>
+                        <div class="row align-items-center">
+                            <div class="col-xl-12">
+
+
+        	<div class="my-3">
+                <div class="input-group mb-3">
+                  <input [(ngModel)]="filterText" name="filterText" autoFocus type="text" class="form-control" [placeholder]="l('SearchWithThreeDot')">
+                  <button class="btn btn-primary" type="submit" (click)="getBloodBanks()"><i class="flaticon-search-1"></i></button>
+                </div>
+            </div>
+
+                            </div>
+                        </div>
+						 <div class="row" [hidden]="!advancedFiltersAreShown">
+						 	<div class="col-md-12">
+
+						     </div>
+
+
+
+
+
+
+                        </div>
+                        <div class="row my-4">
+                            <div class="col-sm-12">
+                                <span class="clickable-item text-muted" *ngIf="!advancedFiltersAreShown" (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i class="fa fa-angle-down"></i> {{l("ShowAdvancedFilters")}}</span>
+                                <span class="clickable-item text-muted" *ngIf="advancedFiltersAreShown" (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i class="fa fa-angle-up"></i> {{l("HideAdvancedFilters")}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="row align-items-center">
+                    <!--<Primeng-Datatable-Start>-->
+                    <div class="primeng-datatable-container col-12"
+                         >
+                        <p-table #dataTable
+                                     (onLazyLoad)="getBloodBanks($event)"
+                                     [value]="primengTableHelper.records"
+                                     rows="{{primengTableHelper.defaultRecordsCountPerPage}}"
+                                     [paginator]="false"
+                                     [lazy]="true"
+                                     [scrollable]="true"
+                                     ScrollWidth="100%"
+                                     [responsive]="primengTableHelper.isResponsive"
+                                     [resizableColumns]="primengTableHelper.resizableColumns">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th style="width: 130px">{{l('Actions')}}</th>
+                                    <th style="width: 150px" pSortableColumn="name">
+                                        {{l('Name')}}
+                                        <p-sortIcon field="bloodBank.name"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="phone">
+                                        {{l('Phone')}}
+                                        <p-sortIcon field="bloodBank.phone"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="email">
+                                        {{l('Email')}}
+                                        <p-sortIcon field="bloodBank.email"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="logo">
+                                        {{l('Logo')}}
+                                        <p-sortIcon field="bloodBank.logo"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="address">
+                                        {{l('Address')}}
+                                        <p-sortIcon field="bloodBank.address"></p-sortIcon>
+                                    </th>
+
+                                </tr>
+                            </ng-template>
+							<ng-template pTemplate="body" let-record="$implicit" let-i="rowIndex">
+                                <tr>
+                                    <td style="width: 130px">
+                                       <div class="btn-group dropdown" dropdown container="body">
+                                            <button class="dropdown-toggle btn btn-sm btn-primary" dropdownToggle>
+                                                <i class="fa fa-cog"></i><span class="caret"></span> {{l("Actions")}}
+                                            </button>
+												<ul class="dropdown-menu"  *dropdownMenu>
+												<li>
+													<a href="javascript:;" class="dropdown-item"
+														(click)="viewBloodBankModal.show(record)">{{l('View')}}</a>
+												</li>
+												<li>
+                                                <a href="javascript:;" *ngIf="permission.isGranted('Pages.BloodBanks.Edit')" class="dropdown-item"
+														(click)="createOrEditBloodBankModal.show(record.bloodBank.id)">{{l('Edit')}}</a>
+                                                </li>
+												<li>
+											        <a class="dropdown-item" href="javascript:;" *ngIf="permission.isGranted('Pages.BloodBanks.Delete')"
+														(click)="deleteBloodBank(record.bloodBank)">{{l('Delete')}}</a>
+												</li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('Name')}}</span>
+											{{record.bloodBank.name}}
+										</td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('Phone')}}</span>
+											{{record.bloodBank.phone}}
+										</td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('Email')}}</span>
+											{{record.bloodBank.email}}
+										</td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('Logo')}}</span>
+											<a href="{{getDownloadUrl(record.bloodBank.logo)}}" target="_blank">{{record.bloodBank.logoFileName}}</a>
+										</td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('Address')}}</span>
+											{{record.bloodBank.address}}
+										</td>
+
+                                </tr>
+
+                            </ng-template>
+                        </p-table>
+						<div class="primeng-no-data" *ngIf="primengTableHelper.totalRecordsCount == 0">
+                            {{l('NoData')}}
+                        </div>
+                        <div class="primeng-paging-container">
+                            <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
+                                         #paginator
+                                         (onPageChange)="getBloodBanks($event)"
+                                         [totalRecords]="primengTableHelper.totalRecordsCount"
+                                         [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage"
+                                         [showCurrentPageReport]="true"
+                                         [currentPageReportTemplate]="'TotalRecordsCount'"
+                            >
+                            </p-paginator>
+                        </div>
+                    </div>
+                    <!--<Primeng-Datatable-End>-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <createOrEditBloodBankModal #createOrEditBloodBankModal (modalSave)="getBloodBanks()"></createOrEditBloodBankModal>
+    <viewBloodBankModal #viewBloodBankModal></viewBloodBankModal>
+
+  </div>
+</div>

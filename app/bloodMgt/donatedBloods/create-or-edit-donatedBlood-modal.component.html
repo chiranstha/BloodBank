@@ -1,0 +1,83 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+    aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #donatedBloodForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="donatedBlood.id">{{l("EditDonatedBlood")}}</span>
+                        <span *ngIf="!donatedBlood.id">{{l("CreateNewDonatedBlood")}}</span>
+                    </h4>
+
+
+                    <button type="button" class="btn-close" (click)="close()" aria-label="Close"
+                        [disabled]="saving"></button>
+
+                </div>
+                <div class="modal-body">
+
+
+
+
+
+                    <div class="my-3">
+                        <label class="form-label" for="DonatedBlood_Date">{{l("Date")}}</label>
+                        <input required class="form-control m-input" #DonatedBlood_Date type="datetime" bsDatepicker
+                            datePickerLuxonModifier id="DonatedBlood_Date" name="DonatedBlood_Date">
+                    </div>
+
+                    <div class="my5">
+                        <label class="form-label" for="DonatedBlood_Quantity">{{l("Quantity")}}</label>
+                        <input type="number" #DonatedBlood_Quantity="ngModel" id="DonatedBlood_Quantity"
+                            class="form-control" [(ngModel)]="donatedBlood.quantity" name="Quantity" />
+                    </div>
+
+                    <div class="my-3">
+                        <label class="form-label" for="DonatedBlood_Remarks">{{l("Remarks")}}</label>
+                        <input type="text" #DonatedBlood_Remarks="ngModel" id="DonatedBlood_Remarks"
+                            class="form-control" [(ngModel)]="donatedBlood.remarks" name="Remarks" />
+                    </div>
+
+                    <div class="my5">
+                        <label class="form-label" for="DonatedBlood_DonarId">{{l("DonarId")}}</label>
+                        <input type="number" #DonatedBlood_DonarId="ngModel" id="DonatedBlood_DonarId"
+                            class="form-control" [(ngModel)]="donatedBlood.donarId" name="DonarId" />
+                    </div>
+
+                    <div class="my-3">
+                        <label class="form-label" for="DonatedBlood_DonationType">{{l("DonationType")}}</label>
+                        <select class="form-select" #DonatedBlood_DonationType="ngModel" name="DonationType"
+                            id="DonatedBlood_DonationType" [(ngModel)]="donatedBlood.donationType">
+                            <option value="0">{{l('BloodBank')}}</option>
+
+                            <option value="1">{{l('RequestedUser')}}</option>
+
+
+                        </select>
+                    </div>
+
+                    <div class="my5">
+                        <label class="form-label" for="DonatedBlood_RequestBloodId">{{l("RequestBloodId")}}</label>
+                        <input type="number" #DonatedBlood_RequestBloodId="ngModel" id="DonatedBlood_RequestBloodId"
+                            class="form-control" [(ngModel)]="donatedBlood.requestBloodId" name="RequestBloodId" />
+                    </div>
+
+                    <div class="my5">
+                        <label class="form-label" for="DonatedBlood_BloodBankId">{{l("BloodBankId")}}</label>
+                        <input type="number" #DonatedBlood_BloodBankId="ngModel" id="DonatedBlood_BloodBankId"
+                            class="form-control" [(ngModel)]="donatedBlood.bloodBankId" name="BloodBankId" />
+                    </div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default"
+                        (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!donatedBloodForm.form.valid"><i
+                            class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

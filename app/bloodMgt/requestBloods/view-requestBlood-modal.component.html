@@ -1,0 +1,80 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">
+                    <span>{{l("Details")}}</span>
+                </h4>
+
+
+                 <button type="button" class="btn-close" (click)="close()" aria-label="Close" [disabled]="saving"></button>
+
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <h6>{{l("BloodGroup")}} :</h6>
+                        {{l( bloodGroup[item.requestBlood.bloodGroup])}}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("PatientName")}} :</h6>
+                        {{ item.requestBlood.patientName }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("ContactPhone")}} :</h6>
+                        {{ item.requestBlood.contactPhone }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("ContactName")}} :</h6>
+                        {{ item.requestBlood.contactName }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("DonarId")}} :</h6>
+                        {{ item.requestBlood.donarId }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("ContactEmail")}} :</h6>
+                        {{ item.requestBlood.contactEmail }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Date")}} :</h6>
+                        {{ item.requestBlood.date   }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Quantity")}} :</h6>
+                        {{ item.requestBlood.quantity }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Hospital")}} :</h6>
+                        {{ item.requestBlood.hospital }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Time")}} :</h6>
+                        {{ item.requestBlood.time }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("CaseDetail")}} :</h6>
+                        {{ item.requestBlood.caseDetail }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("Location")}} :</h6>
+                        {{ item.requestBlood.location }}
+                    </div>
+                    <div class="col-6 mb-3">
+                        <h6>{{l("isDelivered")}} :</h6>
+                        <div *ngIf="item.requestBlood.isDelivered" class="text-left"><i class="fa fa-check-circle text-success"
+                                title="True"></i></div>
+                        <div *ngIf="!item.requestBlood.isDelivered" class="text-left"><i class="fa fa-times-circle" title="False"></i></div>
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button [disabled]="saving" type="button" class="btn btn-primary blue" (click)="close()">{{l("Close")}}</button>
+            </div>
+        </div>
+    </div>
+
+</div>

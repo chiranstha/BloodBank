@@ -1,0 +1,152 @@
+<div class="table-responsive">
+	<table class="table gs-7 gy-7 gx-7">
+		<thead>
+			<tr class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200">
+				<th>Name</th>
+				<th>Position</th>
+				<th>Office</th>
+				<th>Age</th>
+				<th>Start date</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Tiger Nixon</td>
+				<td>System Architect</td>
+				<td>Edinburgh</td>
+				<td>61</td>
+				<td>2011/04/25</td>
+        <td>
+          <span
+            class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary w-30px h-30px"
+            
+          >
+          <!-- (click)="createOrEditCourseCategoryModal.showEdit(items.id)" -->
+            <i class="fa-duotone fa-file-edit fs-2">
+              <span class="path1"></span>
+              <span class="path2"></span>
+            </i>
+          </span>
+
+          <span
+            class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary w-30px h-30px"
+          
+          >
+          <!-- (click)="deletecourse(items.id)" -->
+            <i class="fa-duotone fa-trash-alt fs-2">
+              <span class="path1"></span>
+              <span class="path2"></span>
+            </i>
+          </span>
+        </td>
+			</tr>
+			<tr>
+				<td>Garrett Winters</td>
+				<td>Accountant</td>
+				<td>Tokyo</td>
+				<td>63</td>
+				<td>2011/07/25</td>
+				<td>$170,750</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+
+<button type="button" class="btn btn-primary" (click)="openModalWithClass(template)">Open modal with custom css class</button>
+<br>
+ 
+<ng-template #template>
+  <div class="modal-header border-0">
+    <h4 class="modal-title pull-left">Create Blood Bank</h4>
+    <button type="button" class="close btn-close pull-right" aria-label="Close" (click)="modalRef?.hide()">
+      <span aria-hidden="true" class="visually-hidden">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form" autocomplete="off">
+      <div class="row my-4">
+        <div class="col-md-4">
+          <label for="name">Company Name</label>
+        </div>
+        <div class="col-md-8">
+          <input placeholder="Company name..." name="name"  id="name" 
+          type="text" value="" class="form-control"
+          formControlName="name">
+        </div>
+      </div>
+      <!-- <div class="row my-4">
+        <div class="col-md-4">
+            <label>Company Logo</label>
+        </div>
+        <div class="col-md-8">
+            <input name="image" type="file" class="form-control">
+         </div>
+    </div> -->
+
+
+
+
+      <div class="row my-4">
+        <div class="col-md-4">
+          <label>Company Location</label>
+        </div>
+        <div class="col-md-8">
+          <input placeholder="Company physical address..." name="location" type="text" value="" class="form-control"
+          formControlName="location">
+        </div>
+      </div>
+      <div class="row my-4">
+        <div class="col-md-4">
+          <label for="noOfEmployee">Number of employee</label>
+        </div>
+        <div class="col-md-8">
+          <input placeholder="Number of employees..." name="noOfEmployee"  id="noOfEmployee" 
+          type="number" value="" class="form-control"
+          formControlName="noOfEmployee">
+        </div>
+      </div>
+      <div class="row my-4">
+        <div class="col-md-4">
+          <label for="annualTurnOver">Annual turnover</label>
+        </div>
+        <div class="col-md-8">
+          <input placeholder="What is your annual turnover" name="annualTurnOver"  id="annualTurnOver" 
+          type="number" value="" class="form-control"
+          formControlName="annualTurnOver">
+        </div>
+      </div>
+      <div class="row my-4">
+        <div class="col-md-4">
+          <label for="monthlyTurnOver">Monthly Turnover (Over 6 months)</label>
+        </div>
+        <div class="col-md-8">
+          <input placeholder="What is your annual turnover" name="monthlyTurnOver"  id="monthlyTurnOver" 
+          type="number" value="" class="form-control"
+          formControlName="monthlyTurnOver">
+        </div>
+      </div>
+      <div class="row my-4">
+        <div class="col-md-4">
+            <label>Products/Services</label>
+        </div>
+        <div class="col-md-8">
+            <textarea id="offering" 
+            placeholder="What products or services is your company offering?"
+             name="offering" cols="50" rows="10" class="form-control"
+             formControlName="serviceDescription"
+             ></textarea>
+        </div>
+    </div>
+   
+    <div class="row my-4">
+      <div class="buttons" style="margin-left: 80%;">
+        <button class="btn btn-info text-white">Back</button>
+        <button class="btn btn-info text-white" (click)="save()" style="margin-left: 10px;">Save</button>
+      </div>
+    </div>
+    
+    </form>
+  </div>
+</ng-template>

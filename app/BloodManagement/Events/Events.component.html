@@ -1,0 +1,162 @@
+<button type="button" class="btn btn-primary mt-2  mb-2" (click)="openModalWithClass(template)" style="margin-left: 85%;">Create Events</button>
+<div class="table-responsive">
+	<table class="table gs-7 gy-7 gx-7">
+		<thead>
+			<tr class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200">
+				<th>Name</th>
+				<th>Position</th>
+				<th>Office</th>
+				<th>Age</th>
+				<th>Start date</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Tiger Nixon</td>
+				<td>System Architect</td>
+				<td>Edinburgh</td>
+				<td>61</td>
+				<td>2011/04/25</td>
+        <td>
+          <span
+            class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary w-30px h-30px"
+            
+          >
+          <!-- (click)="createOrEditCourseCategoryModal.showEdit(items.id)" -->
+            <i class="fa-duotone fa-file-edit fs-2">
+              <span class="path1"></span>
+              <span class="path2"></span>
+            </i>
+          </span>
+
+          <span
+            class="btn btn-sm btn-icon btn-bg-light btn-active-color-primary w-30px h-30px"
+          
+          >
+          <!-- (click)="deletecourse(items.id)" -->
+            <i class="fa-duotone fa-trash-alt fs-2">
+              <span class="path1"></span>
+              <span class="path2"></span>
+            </i>
+          </span>
+        </td>
+			</tr>
+			<tr>
+				<td>Garrett Winters</td>
+				<td>Accountant</td>
+				<td>Tokyo</td>
+				<td>63</td>
+				<td>2011/07/25</td>
+				<td>$170,750</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+
+
+<br>
+ 
+<ng-template #template>
+  <div class="modal-header border-0">
+    <h4 class="modal-title pull-left">Create events</h4>
+    <button type="button" class="close btn-close pull-right" aria-label="Close" (click)="modalRef?.hide()">
+      <span aria-hidden="true" class="visually-hidden">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form" autocomplete="off">
+      <!-- Title -->
+      <div class="row my-4">
+        <div class="col-md-4">
+          <label for="title"> Title</label>
+        </div>
+        <div class="col-md-8">
+          <input placeholder="Enter title..." name="title"  id="title" 
+          type="text" value="" class="form-control"
+          formControlName="title">
+        </div>
+      </div>
+      <!-- Is Approved  -->
+      <div class="row my-4">
+        <div class="col-md-4">
+          <label>Is Approved?</label>
+        </div>
+        <div class="col-md-8 gap-5">
+          <label>Yes &nbsp; 
+            <input formControlName="isApproved" name="registered" type="radio" class="radio" value="true" (change)="updateOptionSelected(form.get('isApproved'), true)">
+          </label> &nbsp;
+          <label>No &nbsp;
+            <input formControlName="isApproved" name="registered" type="radio" class="radio" value="false" (change)="updateOptionSelected(form.get('isApproved'), false)">
+          </label>
+        </div>
+      </div>
+
+
+<!-- Location  -->
+      <div class="row my-4">
+        <div class="col-md-4">
+          <label>Location</label>
+        </div>
+        <div class="col-md-8">
+          <input placeholder="physical address..." name="location" type="text" value="" class="form-control"
+          formControlName="location">
+        </div>
+      </div>
+
+      <!-- Descriptions  -->
+      <div class="row my-4">
+        <div class="col-md-4">
+          <label>Description</label>
+        </div>
+        <div class="col-md-8">
+          <input placeholder="description" name="description" type="text" value="" class="form-control"
+          formControlName="description">
+        </div>
+      </div>
+      <!-- contactNo  -->
+      <div class="row my-4">
+        <div class="col-md-4">
+          <label for="contactNo">Contact Number</label>
+        </div>
+
+        <div class="col-md-8">
+          <input placeholder="Ambulance Number..." name="contactNo"  id="contactNo" 
+          type="number" value="" class="form-control"
+          formControlName="contactNo">
+        </div>
+      </div>
+      <!-- date  -->
+      <!-- <div class="row my-4">
+        <div class="col-md-4">
+          <label for="phoneNo1">Date</label>
+        </div>
+        <div class="col-md-8">
+          <input type="text"
+          placeholder="Daterangepicker"
+          class="form-control"
+          bsDaterangepicker>
+        </div>
+      </div> -->
+      <!-- <div class="row my-4">
+        <div class="col-md-4">
+          <label for="phoneNo1">Image</label>
+        </div>
+        <div class="col-md-8">
+          <input type="file" id="myfile" name="myfile" multiple formControlName="image"><br><br>
+        </div>
+      </div> -->
+   
+   
+    <div class="row my-4">
+      <div class="buttons" style="margin-left: 80%;">
+        <button class="btn btn-info text-white">Back</button>
+        <button class="btn btn-info text-white" (click)="save()" style="margin-left: 10px;">Save</button>
+      </div>
+    </div>
+    
+    </form>
+    {{this.form.getRawValue()|json}}
+  </div>
+</ng-template>

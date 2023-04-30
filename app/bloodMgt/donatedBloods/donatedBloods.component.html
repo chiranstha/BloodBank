@@ -1,0 +1,182 @@
+﻿<div [@routerTransition]>
+
+  <div class="content d-flex flex-column flex-column-fluid">
+   <div class="row">
+             <div role="actions">
+                 <button (click)="exportToExcel()" class="btn btn-outline btn-outline-success btn-active-light-success me-1"><i class="fa fa-file-excel"></i> {{l("ExportToExcel")}}</button>
+
+                 <button *ngIf="isGranted('Pages.DonatedBloods.Create')" (click)="createDonatedBlood()"
+                                        class="btn btn-primary blue"><i class="fa fa-plus"></i> {{l("CreateNewDonatedBlood")}}</button>
+             </div>
+            </div>
+
+    <div [class]="containerClass">
+        <div class="card card-custom gutter-b">
+            <div class="card-body">
+                <form class="form" autocomplete="off">
+                    <div>
+                        <div class="row align-items-center">
+                            <div class="col-xl-12">
+
+
+        	<div class="my-3">
+                <div class="input-group mb-3">
+                  <input [(ngModel)]="filterText" name="filterText" autoFocus type="text" class="form-control" [placeholder]="l('SearchWithThreeDot')">
+                  <button class="btn btn-primary" type="submit" (click)="getDonatedBloods()"><i class="flaticon-search-1"></i></button>
+                </div>
+            </div>
+
+                            </div>
+                        </div>
+						 <div class="row" [hidden]="!advancedFiltersAreShown">
+						 	<div class="col-md-12">
+
+						     </div>
+
+
+
+
+
+
+                        </div>
+                        <div class="row my-4">
+                            <div class="col-sm-12">
+                                <span class="clickable-item text-muted" *ngIf="!advancedFiltersAreShown" (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i class="fa fa-angle-down"></i> {{l("ShowAdvancedFilters")}}</span>
+                                <span class="clickable-item text-muted" *ngIf="advancedFiltersAreShown" (click)="advancedFiltersAreShown=!advancedFiltersAreShown"><i class="fa fa-angle-up"></i> {{l("HideAdvancedFilters")}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="row align-items-center">
+                    <!--<Primeng-Datatable-Start>-->
+                    <div class="primeng-datatable-container col-12"
+                         >
+                        <p-table #dataTable
+                                     (onLazyLoad)="getDonatedBloods($event)"
+                                     [value]="primengTableHelper.records"
+                                     rows="{{primengTableHelper.defaultRecordsCountPerPage}}"
+                                     [paginator]="false"
+                                     [lazy]="true"
+                                     [scrollable]="true"
+                                     ScrollWidth="100%"
+                                     [responsive]="primengTableHelper.isResponsive"
+                                     [resizableColumns]="primengTableHelper.resizableColumns">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th style="width: 130px">{{l('Actions')}}</th>
+                                    <th style="width: 150px" pSortableColumn="date">
+                                        {{l('Date')}}
+                                        <p-sortIcon field="donatedBlood.date"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="quantity">
+                                        {{l('Quantity')}}
+                                        <p-sortIcon field="donatedBlood.quantity"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="remarks">
+                                        {{l('Remarks')}}
+                                        <p-sortIcon field="donatedBlood.remarks"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="donarId">
+                                        {{l('DonarId')}}
+                                        <p-sortIcon field="donatedBlood.donarId"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="donationType">
+                                        {{l('DonationType')}}
+                                        <p-sortIcon field="donatedBlood.donationType"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="requestBloodId">
+                                        {{l('RequestBloodId')}}
+                                        <p-sortIcon field="donatedBlood.requestBloodId"></p-sortIcon>
+                                    </th>
+                                    <th style="width: 150px" pSortableColumn="bloodBankId">
+                                        {{l('BloodBankId')}}
+                                        <p-sortIcon field="donatedBlood.bloodBankId"></p-sortIcon>
+                                    </th>
+
+                                </tr>
+                            </ng-template>
+							<ng-template pTemplate="body" let-record="$implicit" let-i="rowIndex">
+                                <tr>
+                                    <td style="width: 130px">
+                                       <div class="btn-group dropdown" dropdown container="body">
+                                            <button class="dropdown-toggle btn btn-sm btn-primary" dropdownToggle>
+                                                <i class="fa fa-cog"></i><span class="caret"></span> {{l("Actions")}}
+                                            </button>
+												<ul class="dropdown-menu"  *dropdownMenu>
+												<li>
+													<a href="javascript:;" class="dropdown-item"
+														(click)="viewDonatedBloodModal.show(record)">{{l('View')}}</a>
+												</li>
+												<li>
+                                                <a href="javascript:;" *ngIf="permission.isGranted('Pages.DonatedBloods.Edit')" class="dropdown-item"
+														(click)="createOrEditDonatedBloodModal.show(record.donatedBlood.id)">{{l('Edit')}}</a>
+                                                </li>
+												<li>
+											        <a class="dropdown-item" href="javascript:;" *ngIf="permission.isGranted('Pages.DonatedBloods.Delete')"
+														(click)="deleteDonatedBlood(record.donatedBlood)">{{l('Delete')}}</a>
+												</li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                    <td style="width:150px">
+										<span class="p-column-title"> {{l('Date')}}</span>
+                                        <span *ngIf="record.donatedBlood.date">
+											{{record.donatedBlood.date}}
+                                        </span>
+                                        <span *ngIf="!record.donatedBlood.date">-</span>
+                                    </td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('Quantity')}}</span>
+											{{record.donatedBlood.quantity}}
+										</td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('Remarks')}}</span>
+											{{record.donatedBlood.remarks}}
+										</td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('DonarId')}}</span>
+											{{record.donatedBlood.donarId}}
+										</td>
+                                    <td style="width:150px">
+										<span class="p-column-title"> {{l('DonationType')}}</span>
+										{{l( donationType[record.donatedBlood.donationType])}}
+                                    </td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('RequestBloodId')}}</span>
+											{{record.donatedBlood.requestBloodId}}
+										</td>
+                                    <td style="width:150px">
+											<span class="p-column-title"> {{l('BloodBankId')}}</span>
+											{{record.donatedBlood.bloodBankId}}
+										</td>
+
+                                </tr>
+
+                            </ng-template>
+                        </p-table>
+						<div class="primeng-no-data" *ngIf="primengTableHelper.totalRecordsCount == 0">
+                            {{l('NoData')}}
+                        </div>
+                        <div class="primeng-paging-container">
+                            <p-paginator [rows]="primengTableHelper.defaultRecordsCountPerPage"
+                                         #paginator
+                                         (onPageChange)="getDonatedBloods($event)"
+                                         [totalRecords]="primengTableHelper.totalRecordsCount"
+                                         [rowsPerPageOptions]="primengTableHelper.predefinedRecordsCountPerPage"
+                                         [showCurrentPageReport]="true"
+                                         [currentPageReportTemplate]="'TotalRecordsCount'"
+                            >
+                            </p-paginator>
+                        </div>
+                    </div>
+                    <!--<Primeng-Datatable-End>-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <createOrEditDonatedBloodModal #createOrEditDonatedBloodModal (modalSave)="getDonatedBloods()"></createOrEditDonatedBloodModal>
+    <viewDonatedBloodModal #viewDonatedBloodModal></viewDonatedBloodModal>
+
+  </div>
+</div>

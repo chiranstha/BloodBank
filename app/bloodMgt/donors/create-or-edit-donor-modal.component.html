@@ -1,0 +1,166 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #donorForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="donor.id">{{l("EditDonor")}}</span>
+                        <span *ngIf="!donor.id">{{l("CreateNewDonor")}}</span>
+                    </h4>
+
+
+                 <button type="button" class="btn-close" (click)="close()" aria-label="Close" [disabled]="saving"></button>
+
+                </div>
+                <div class="modal-body">
+
+
+
+
+
+								<div class="my-3">
+									<label class="form-label" for="Donor_BloodGroup">{{l("BloodGroup")}}</label>
+									<select class="form-select" #Donor_BloodGroup="ngModel" name="BloodGroup" id="Donor_BloodGroup" [(ngModel)]="donor.bloodGroup" >
+									<option value="0">{{l('APos')}}</option>
+
+									<option value="1">{{l('ANeg')}}</option>
+
+									<option value="2">{{l('BPos')}}</option>
+
+									<option value="3">{{l('BNeg')}}</option>
+
+									<option value="4">{{l('ABPos')}}</option>
+
+									<option value="5">{{l('ABNeg')}}</option>
+
+									<option value="6">{{l('OPos')}}</option>
+
+									<option value="7">{{l('ONeg')}}</option>
+
+
+									</select>
+								</div>
+
+								<div class="my-3">
+									<label class="form-label" for="Donor_Gender">{{l("Gender")}}</label>
+									<select class="form-select" #Donor_Gender="ngModel" name="Gender" id="Donor_Gender" [(ngModel)]="donor.gender" >
+									<option value="0">{{l('Male')}}</option>
+
+									<option value="1">{{l('Female')}}</option>
+
+									<option value="2">{{l('Other')}}</option>
+
+
+									</select>
+								</div>
+
+								<div class="my-3">
+									<label class="form-label" for="Donor_Phone">{{l("Phone")}}</label>
+									<input type="text" #Donor_Phone="ngModel" id="Donor_Phone" class="form-control" [(ngModel)]="donor.phone" name="Phone"    />
+
+								</div>
+
+								<div class="my-3">
+									<label class="form-label" for="Donor_Email">{{l("Email")}}</label>
+									<input type="text" #Donor_Email="ngModel" id="Donor_Email" class="form-control" [(ngModel)]="donor.email" name="Email"    />
+
+								</div>
+
+								<div class="my-3">
+									<label class="form-label" for="Donor_Location">{{l("Location")}}</label>
+									<input type="text" #Donor_Location="ngModel" id="Donor_Location" class="form-control" [(ngModel)]="donor.location" name="Location"    />
+
+								</div>
+
+								<div class="my-3">
+									<label class="form-label" for="Donor_DOB">{{l("DOB")}}</label>
+									 <input required class="form-control m-input" #Donor_DOB type="datetime" bsDatepicker  datePickerLuxonModifier  id="Donor_DOB" name="Donor_DOB">
+
+								</div>
+
+								<div class="my5">
+									<label class="form-label" for="Donor_Weight">{{l("Weight")}}</label>
+									<input type="number" #Donor_Weight="ngModel" id="Donor_Weight" class="form-control" [(ngModel)]="donor.weight" name="Weight"   />
+										</div>
+
+								<div class="my-3">
+									<label class="form-label" for="Donor_Disease">{{l("Disease")}}</label>
+									<input type="text" #Donor_Disease="ngModel" id="Donor_Disease" class="form-control" [(ngModel)]="donor.disease" name="Disease"    />
+								  </div>
+
+								<br/>
+								<label class="form-check form-check-custom form-check-solid">
+                                    <input
+                                        id="Donor_isSmoking"
+                                        #Donor_isSmoking="ngModel"
+                                        name="isSmoking"
+                                        [(ngModel)]="donor.isSmoking"
+                                        type="checkbox"
+                                        class="form-check-input"
+                                    />
+                                    <span class="form-check-label">
+                                        {{l("isSmoking")}}
+                                    </span>
+                                </label>
+
+								<br/>
+								<label class="form-check form-check-custom form-check-solid">
+                                    <input
+                                        id="Donor_isAlcohol"
+                                        #Donor_isAlcohol="ngModel"
+                                        name="isAlcohol"
+                                        [(ngModel)]="donor.isAlcohol"
+                                        type="checkbox"
+                                        class="form-check-input"
+                                    />
+                                    <span class="form-check-label">
+                                        {{l("isAlcohol")}}
+                                    </span>
+                                </label>
+
+								<div class="my-3">
+									<label class="form-label" for="Donor_Medicine">{{l("Medicine")}}</label>
+									<input type="text" #Donor_Medicine="ngModel" id="Donor_Medicine" class="form-control" [(ngModel)]="donor.medicine" name="Medicine"    />
+									</div>
+
+                                <div class="my-3">
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text" id="inputGroupFileAddon01">{{ l('Image') }}</span>
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input"
+                                                   id="Donor_Image"
+                                                   name="Donor_Image"
+                                                   aria-describedby="inputGroupFileAddon01"
+                                                  (change)="onSelectImageFile($event)"
+                                                  [accept]="imageFileAcceptedTypes"
+                                            />
+                                            <label class="custom-file-label" #Donor_ImageLabel for="Donor_Image">{{ l('ChooseAFile') }}</label>
+                                        </div>
+                                    </div>
+
+                                    <div *ngIf="imageFileName" style="background-color:#e5e5e5; padding:5px">
+                                        <span class="font-weight-bold">{{'CurrentFile' }} :</span>
+                                        <div class="alert alert-custom alert-white alert-bold m-1" role="alert">
+                                            <div class="alert-text">
+                                                <a href="{{getDownloadUrl(donor.image)}}" target="_blank">{{imageFileName}}</a>
+                                            </div>
+                                            <div class="alert-close">
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true" (click)="removeImageFile()"><i class="la la-close fa-1x"></i></span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!donorForm.form.valid"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

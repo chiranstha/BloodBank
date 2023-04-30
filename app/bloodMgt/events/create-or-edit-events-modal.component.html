@@ -1,0 +1,81 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #eventsForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="events.id">{{l("EditEvents")}}</span>
+                        <span *ngIf="!events.id">{{l("CreateNewEvents")}}</span>
+                    </h4>
+
+
+                 <button type="button" class="btn-close" (click)="close()" aria-label="Close" [disabled]="saving"></button>
+
+                </div>
+                <div class="modal-body">
+
+
+
+
+
+								<div class="my-3">
+									<label class="form-label" for="Events_Title">{{l("Title")}}</label>
+									<input type="text" #Events_Title="ngModel" id="Events_Title" class="form-control" [(ngModel)]="events.title" name="Title"    />
+
+								</div>
+
+								<div class="my-3">
+									<label class="form-label" for="Events_Description">{{l("Description")}}</label>
+									<input type="text" #Events_Description="ngModel" id="Events_Description" class="form-control" [(ngModel)]="events.description" name="Description"    />
+
+								</div>
+
+								<div class="my-3">
+									<label class="form-label" for="Events_Location">{{l("Location")}}</label>
+									<input type="text" #Events_Location="ngModel" id="Events_Location" class="form-control" [(ngModel)]="events.location" name="Location"    />
+
+								</div>
+
+								<div class="my-3">
+									<label class="form-label" for="Events_ContactNo">{{l("ContactNo")}}</label>
+									<input type="text" #Events_ContactNo="ngModel" id="Events_ContactNo" class="form-control" [(ngModel)]="events.contactNo" name="ContactNo"    />
+								   </div>
+
+								<div class="my-3">
+									<label class="form-label" for="Events_Date">{{l("Date")}}</label>
+									 <input required class="form-control m-input" #Events_Date type="datetime" bsDatepicker  datePickerLuxonModifier  id="Events_Date" name="Events_Date">
+								</div>
+
+								<div class="my-3">
+									<label class="form-label" for="Events_Time">{{l("Time")}}</label>
+									<input type="text" #Events_Time="ngModel" id="Events_Time" class="form-control" [(ngModel)]="events.time" name="Time"    />
+								  </div>
+
+
+								<br/>
+								<label class="form-check form-check-custom form-check-solid">
+                                    <input
+                                        id="Events_isApproved"
+                                        #Events_isApproved="ngModel"
+                                        name="isApproved"
+                                        [(ngModel)]="events.isApproved"
+                                        type="checkbox"
+                                        class="form-check-input"
+                                    />
+                                    <span class="form-check-label">
+                                        {{l("isApproved")}}
+                                    </span>
+                                </label>
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!eventsForm.form.valid"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

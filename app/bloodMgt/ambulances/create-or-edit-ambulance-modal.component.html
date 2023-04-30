@@ -1,0 +1,77 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #ambulanceForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="ambulance.id">{{l("EditAmbulance")}}</span>
+                        <span *ngIf="!ambulance.id">{{l("CreateNewAmbulance")}}</span>
+                    </h4>
+
+
+                 <button type="button" class="btn-close" (click)="close()" aria-label="Close" [disabled]="saving"></button>
+
+                </div>
+                <div class="modal-body">
+
+
+
+
+
+								<div class="my-3">
+									<label class="form-label" for="Ambulance_Name">{{l("Name")}}</label>
+									<input type="text" #Ambulance_Name="ngModel" id="Ambulance_Name" class="form-control" [(ngModel)]="ambulance.name" name="Name"    />
+								   </div>
+
+								<div class="my-3">
+									<label class="form-label" for="Ambulance_Location">{{l("Location")}}</label>
+									<input type="text" #Ambulance_Location="ngModel" id="Ambulance_Location" class="form-control" [(ngModel)]="ambulance.location" name="Location"    />
+								   </div>
+
+								<div class="my-3">
+									<label class="form-label" for="Ambulance_ContactPerson">{{l("ContactPerson")}}</label>
+									<input type="text" #Ambulance_ContactPerson="ngModel" id="Ambulance_ContactPerson" class="form-control" [(ngModel)]="ambulance.contactPerson" name="ContactPerson"    />
+								  	</div>
+
+								<div class="my-3">
+									<label class="form-label" for="Ambulance_AmbulanceNumber">{{l("AmbulanceNumber")}}</label>
+									<input type="text" #Ambulance_AmbulanceNumber="ngModel" id="Ambulance_AmbulanceNumber" class="form-control" [(ngModel)]="ambulance.ambulanceNumber" name="AmbulanceNumber"    />
+								  </div>
+
+								<div class="my-3">
+									<label class="form-label" for="Ambulance_PhoneNo1">{{l("PhoneNo1")}}</label>
+									<input type="text" #Ambulance_PhoneNo1="ngModel" id="Ambulance_PhoneNo1" class="form-control" [(ngModel)]="ambulance.phoneNo1" name="PhoneNo1"    />
+								  </div>
+
+								<div class="my-3">
+									<label class="form-label" for="Ambulance_PhoneNo2">{{l("PhoneNo2")}}</label>
+									<input type="text" #Ambulance_PhoneNo2="ngModel" id="Ambulance_PhoneNo2" class="form-control" [(ngModel)]="ambulance.phoneNo2" name="PhoneNo2"    />
+								   	</div>
+
+								<br/>
+								<label class="form-check form-check-custom form-check-solid">
+                                    <input
+                                        id="Ambulance_isApproved"
+                                        #Ambulance_isApproved="ngModel"
+                                        name="isApproved"
+                                        [(ngModel)]="ambulance.isApproved"
+                                        type="checkbox"
+                                        class="form-check-input"
+                                    />
+                                    <span class="form-check-label">
+                                        {{l("isApproved")}}
+                                    </span>
+                                </label>
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!ambulanceForm.form.valid"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>

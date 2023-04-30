@@ -1,0 +1,4 @@
+.radio:checked + .radio-label:before {
+    background-color: blue;
+  }
+  

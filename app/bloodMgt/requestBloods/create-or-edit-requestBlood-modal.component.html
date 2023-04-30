@@ -1,0 +1,127 @@
+﻿<div bsModal #createOrEditModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="createOrEditModal" aria-hidden="true" [config]="{backdrop: 'static'}">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form *ngIf="active" #requestBloodForm="ngForm" novalidate (ngSubmit)="save()" autocomplete="off">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span *ngIf="requestBlood.id">{{l("EditRequestBlood")}}</span>
+                        <span *ngIf="!requestBlood.id">{{l("CreateNewRequestBlood")}}</span>
+                    </h4>
+
+
+                 <button type="button" class="btn-close" (click)="close()" aria-label="Close" [disabled]="saving"></button>
+
+                </div>
+                <div class="modal-body">
+
+
+
+
+
+								<div class="my-3">
+									<label class="form-label" for="RequestBlood_BloodGroup">{{l("BloodGroup")}}</label>
+									<select class="form-select" #RequestBlood_BloodGroup="ngModel" name="BloodGroup" id="RequestBlood_BloodGroup" [(ngModel)]="requestBlood.bloodGroup" >
+									<option value="0">{{l('APos')}}</option>
+
+									<option value="1">{{l('ANeg')}}</option>
+
+									<option value="2">{{l('BPos')}}</option>
+
+									<option value="3">{{l('BNeg')}}</option>
+
+									<option value="4">{{l('ABPos')}}</option>
+
+									<option value="5">{{l('ABNeg')}}</option>
+
+									<option value="6">{{l('OPos')}}</option>
+
+									<option value="7">{{l('ONeg')}}</option>
+
+
+									</select>
+
+								</div>
+
+								<div class="my-3">
+									<label class="form-label" for="RequestBlood_PatientName">{{l("PatientName")}}</label>
+									<input type="text" #RequestBlood_PatientName="ngModel" id="RequestBlood_PatientName" class="form-control" [(ngModel)]="requestBlood.patientName" name="PatientName"    />
+
+								</div>
+
+								<div class="my-3">
+									<label class="form-label" for="RequestBlood_ContactPhone">{{l("ContactPhone")}}</label>
+									<input type="text" #RequestBlood_ContactPhone="ngModel" id="RequestBlood_ContactPhone" class="form-control" [(ngModel)]="requestBlood.contactPhone" name="ContactPhone"    />
+
+								</div>
+
+								<div class="my-3">
+									<label class="form-label" for="RequestBlood_ContactName">{{l("ContactName")}}</label>
+									<input type="text" #RequestBlood_ContactName="ngModel" id="RequestBlood_ContactName" class="form-control" [(ngModel)]="requestBlood.contactName" name="ContactName"    />
+								   </div>
+
+								<div class="my5">
+									<label class="form-label" for="RequestBlood_DonarId">{{l("DonarId")}}</label>
+									<input type="number" #RequestBlood_DonarId="ngModel" id="RequestBlood_DonarId" class="form-control" [(ngModel)]="requestBlood.donarId" name="DonarId"   />
+									</div>
+
+								<div class="my-3">
+									<label class="form-label" for="RequestBlood_ContactEmail">{{l("ContactEmail")}}</label>
+									<input type="text" #RequestBlood_ContactEmail="ngModel" id="RequestBlood_ContactEmail" class="form-control" [(ngModel)]="requestBlood.contactEmail" name="ContactEmail"    />
+								   </div>
+
+								<div class="my-3">
+									<label class="form-label" for="RequestBlood_Date">{{l("Date")}}</label>
+									 <input required class="form-control m-input" #RequestBlood_Date type="datetime" bsDatepicker  datePickerLuxonModifier id="RequestBlood_Date" name="RequestBlood_Date">
+									</div>
+
+								<div class="my5">
+									<label class="form-label" for="RequestBlood_Quantity">{{l("Quantity")}}</label>
+									<input type="number" #RequestBlood_Quantity="ngModel" id="RequestBlood_Quantity" class="form-control" [(ngModel)]="requestBlood.quantity" name="Quantity"   />
+									</div>
+
+								<div class="my-3">
+									<label class="form-label" for="RequestBlood_Hospital">{{l("Hospital")}}</label>
+									<input type="text" #RequestBlood_Hospital="ngModel" id="RequestBlood_Hospital" class="form-control" [(ngModel)]="requestBlood.hospital" name="Hospital"    />
+								  </div>
+
+								<div class="my-3">
+									<label class="form-label" for="RequestBlood_Time">{{l("Time")}}</label>
+									<input type="text" #RequestBlood_Time="ngModel" id="RequestBlood_Time" class="form-control" [(ngModel)]="requestBlood.time" name="Time"    />
+								   </div>
+
+								<div class="my-3">
+									<label class="form-label" for="RequestBlood_CaseDetail">{{l("CaseDetail")}}</label>
+									<input type="text" #RequestBlood_CaseDetail="ngModel" id="RequestBlood_CaseDetail" class="form-control" [(ngModel)]="requestBlood.caseDetail" name="CaseDetail"    />
+								  </div>
+
+								<div class="my-3">
+									<label class="form-label" for="RequestBlood_Location">{{l("Location")}}</label>
+									<input type="text" #RequestBlood_Location="ngModel" id="RequestBlood_Location" class="form-control" [(ngModel)]="requestBlood.location" name="Location"    />
+								  	</div>
+
+								<br/>
+								<label class="form-check form-check-custom form-check-solid">
+                                    <input
+                                        id="RequestBlood_isDelivered"
+                                        #RequestBlood_isDelivered="ngModel"
+                                        name="isDelivered"
+                                        [(ngModel)]="requestBlood.isDelivered"
+                                        type="checkbox"
+                                        class="form-check-input"
+                                    />
+                                    <span class="form-check-label">
+                                        {{l("isDelivered")}}
+                                    </span>
+                                </label>
+
+
+                </div>
+                <div class="modal-footer">
+                    <button [disabled]="saving" type="button" class="btn btn-default" (click)="close()">{{l("Cancel")}}</button>
+                    <button type="submit" class="btn btn-primary blue" [disabled]="!requestBloodForm.form.valid"><i class="fa fa-save"></i> <span>{{l("Save")}}</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
