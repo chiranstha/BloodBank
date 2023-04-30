@@ -159,8 +159,8 @@ export class AmbulancesServiceProxy {
      * @param maxResultCount (optional) 
      * @return Success
      */
-    getAll(filter: string | undefined, sorting: string | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAmbulanceForViewDtoPagedResultDto> {
-        let url_ = this.baseUrl + "/api/services/app/Ambulances/GetAll?";
+    getAllApproved(filter: string | undefined, sorting: string | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAmbulanceForViewDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/Ambulances/GetAllApproved?";
         if (filter === null)
             throw new Error("The parameter 'filter' cannot be null.");
         else if (filter !== undefined)
@@ -188,11 +188,11 @@ export class AmbulancesServiceProxy {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAll(response_);
+            return this.processGetAllApproved(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processGetAll(response_ as any);
+                    return this.processGetAllApproved(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<GetAmbulanceForViewDtoPagedResultDto>;
                 }
@@ -201,7 +201,78 @@ export class AmbulancesServiceProxy {
         }));
     }
 
-    protected processGetAll(response: HttpResponseBase): Observable<GetAmbulanceForViewDtoPagedResultDto> {
+    protected processGetAllApproved(response: HttpResponseBase): Observable<GetAmbulanceForViewDtoPagedResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetAmbulanceForViewDtoPagedResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param filter (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAllUnApproved(filter: string | undefined, sorting: string | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAmbulanceForViewDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/Ambulances/GetAllUnApproved?";
+        if (filter === null)
+            throw new Error("The parameter 'filter' cannot be null.");
+        else if (filter !== undefined)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (sorting === null)
+            throw new Error("The parameter 'sorting' cannot be null.");
+        else if (sorting !== undefined)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllUnApproved(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllUnApproved(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetAmbulanceForViewDtoPagedResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetAmbulanceForViewDtoPagedResultDto>;
+        }));
+    }
+
+    protected processGetAllUnApproved(response: HttpResponseBase): Observable<GetAmbulanceForViewDtoPagedResultDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -430,62 +501,6 @@ export class AmbulancesServiceProxy {
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             return _observableOf(null as any);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @param filter (optional) 
-     * @return Success
-     */
-    getAmbulancesToExcel(filter: string | undefined): Observable<FileDto> {
-        let url_ = this.baseUrl + "/api/services/app/Ambulances/GetAmbulancesToExcel?";
-        if (filter === null)
-            throw new Error("The parameter 'filter' cannot be null.");
-        else if (filter !== undefined)
-            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetAmbulancesToExcel(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetAmbulancesToExcel(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileDto>;
-        }));
-    }
-
-    protected processGetAmbulancesToExcel(response: HttpResponseBase): Observable<FileDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = FileDto.fromJS(resultData200);
-            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -853,62 +868,6 @@ export class BloodBanksServiceProxy {
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             return _observableOf(null as any);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @param filter (optional) 
-     * @return Success
-     */
-    getBloodBanksToExcel(filter: string | undefined): Observable<FileDto> {
-        let url_ = this.baseUrl + "/api/services/app/BloodBanks/GetBloodBanksToExcel?";
-        if (filter === null)
-            throw new Error("The parameter 'filter' cannot be null.");
-        else if (filter !== undefined)
-            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetBloodBanksToExcel(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetBloodBanksToExcel(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileDto>;
-        }));
-    }
-
-    protected processGetBloodBanksToExcel(response: HttpResponseBase): Observable<FileDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = FileDto.fromJS(resultData200);
-            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -2248,62 +2207,6 @@ export class DonorsServiceProxy {
     }
 
     /**
-     * @param filter (optional) 
-     * @return Success
-     */
-    getDonorsToExcel(filter: string | undefined): Observable<FileDto> {
-        let url_ = this.baseUrl + "/api/services/app/Donors/GetDonorsToExcel?";
-        if (filter === null)
-            throw new Error("The parameter 'filter' cannot be null.");
-        else if (filter !== undefined)
-            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetDonorsToExcel(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetDonorsToExcel(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileDto>;
-        }));
-    }
-
-    protected processGetDonorsToExcel(response: HttpResponseBase): Observable<FileDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = FileDto.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
      * @param id (optional) 
      * @return Success
      */
@@ -2713,62 +2616,6 @@ export class EventsServiceProxy {
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             return _observableOf(null as any);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @param filter (optional) 
-     * @return Success
-     */
-    getEventsToExcel(filter: string | undefined): Observable<FileDto> {
-        let url_ = this.baseUrl + "/api/services/app/Events/GetEventsToExcel?";
-        if (filter === null)
-            throw new Error("The parameter 'filter' cannot be null.");
-        else if (filter !== undefined)
-            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "text/plain"
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processGetEventsToExcel(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processGetEventsToExcel(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<FileDto>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<FileDto>;
-        }));
-    }
-
-    protected processGetEventsToExcel(response: HttpResponseBase): Observable<FileDto> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = FileDto.fromJS(resultData200);
-            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -4955,75 +4802,654 @@ export class UserServiceProxy {
     }
 }
 
-export class AmbulanceDto implements IAmbulanceDto {
-    id: number;
-    name: string | undefined;
-    location: string | undefined;
-    contactPerson: string | undefined;
-    ambulanceNumber: string | undefined;
-    phoneNo1: string | undefined;
-    phoneNo2: string | undefined;
-    isApproved: boolean;
+@Injectable()
+export class UserAmbulancesServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
 
-    constructor(data?: IAmbulanceDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @param filter (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAllAmbulanceForUser(filter: string | undefined, sorting: string | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetAmbulanceForViewDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/UserAmbulances/GetAllAmbulanceForUser?";
+        if (filter === null)
+            throw new Error("The parameter 'filter' cannot be null.");
+        else if (filter !== undefined)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (sorting === null)
+            throw new Error("The parameter 'sorting' cannot be null.");
+        else if (sorting !== undefined)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllAmbulanceForUser(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllAmbulanceForUser(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetAmbulanceForViewDtoPagedResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetAmbulanceForViewDtoPagedResultDto>;
+        }));
+    }
+
+    protected processGetAllAmbulanceForUser(response: HttpResponseBase): Observable<GetAmbulanceForViewDtoPagedResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetAmbulanceForViewDtoPagedResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
+        return _observableOf(null as any);
     }
 
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-            this.location = _data["location"];
-            this.contactPerson = _data["contactPerson"];
-            this.ambulanceNumber = _data["ambulanceNumber"];
-            this.phoneNo1 = _data["phoneNo1"];
-            this.phoneNo2 = _data["phoneNo2"];
-            this.isApproved = _data["isApproved"];
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getAmbulanceForUserView(id: number | undefined): Observable<GetAmbulanceForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/UserAmbulances/GetAmbulanceForUserView?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAmbulanceForUserView(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAmbulanceForUserView(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetAmbulanceForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetAmbulanceForViewDto>;
+        }));
+    }
+
+    protected processGetAmbulanceForUserView(response: HttpResponseBase): Observable<GetAmbulanceForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetAmbulanceForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
         }
+        return _observableOf(null as any);
     }
 
-    static fromJS(data: any): AmbulanceDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new AmbulanceDto();
-        result.init(data);
-        return result;
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getAmbulanceForUserEdit(id: number | undefined): Observable<GetAmbulanceForEditOutput> {
+        let url_ = this.baseUrl + "/api/services/app/UserAmbulances/GetAmbulanceForUserEdit?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAmbulanceForUserEdit(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAmbulanceForUserEdit(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetAmbulanceForEditOutput>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetAmbulanceForEditOutput>;
+        }));
     }
 
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        data["location"] = this.location;
-        data["contactPerson"] = this.contactPerson;
-        data["ambulanceNumber"] = this.ambulanceNumber;
-        data["phoneNo1"] = this.phoneNo1;
-        data["phoneNo2"] = this.phoneNo2;
-        data["isApproved"] = this.isApproved;
-        return data;
+    protected processGetAmbulanceForUserEdit(response: HttpResponseBase): Observable<GetAmbulanceForEditOutput> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetAmbulanceForEditOutput.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
     }
 
-    clone(): AmbulanceDto {
-        const json = this.toJSON();
-        let result = new AmbulanceDto();
-        result.init(json);
-        return result;
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createOrEditAmbulance(body: CreateOrEditAmbulanceDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/UserAmbulances/CreateOrEditAmbulance";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrEditAmbulance(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrEditAmbulance(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processCreateOrEditAmbulance(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    delete(id: number | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/UserAmbulances/Delete?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
     }
 }
 
-export interface IAmbulanceDto {
-    id: number;
-    name: string | undefined;
-    location: string | undefined;
-    contactPerson: string | undefined;
-    ambulanceNumber: string | undefined;
-    phoneNo1: string | undefined;
-    phoneNo2: string | undefined;
-    isApproved: boolean;
+@Injectable()
+export class UserEventsServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl !== undefined && baseUrl !== null ? baseUrl : "";
+    }
+
+    /**
+     * @param filter (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return Success
+     */
+    getAll(filter: string | undefined, sorting: string | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<GetEventsForViewDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/UserEvents/GetAll?";
+        if (filter === null)
+            throw new Error("The parameter 'filter' cannot be null.");
+        else if (filter !== undefined)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (sorting === null)
+            throw new Error("The parameter 'sorting' cannot be null.");
+        else if (sorting !== undefined)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetEventsForViewDtoPagedResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetEventsForViewDtoPagedResultDto>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<GetEventsForViewDtoPagedResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetEventsForViewDtoPagedResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getEventsForView(id: number | undefined): Observable<GetEventsForViewDto> {
+        let url_ = this.baseUrl + "/api/services/app/UserEvents/GetEventsForView?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEventsForView(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEventsForView(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetEventsForViewDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetEventsForViewDto>;
+        }));
+    }
+
+    protected processGetEventsForView(response: HttpResponseBase): Observable<GetEventsForViewDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetEventsForViewDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    getEventsForEdit(id: number | undefined): Observable<GetEventsForEditOutput> {
+        let url_ = this.baseUrl + "/api/services/app/UserEvents/GetEventsForEdit?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetEventsForEdit(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetEventsForEdit(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetEventsForEditOutput>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetEventsForEditOutput>;
+        }));
+    }
+
+    protected processGetEventsForEdit(response: HttpResponseBase): Observable<GetEventsForEditOutput> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetEventsForEditOutput.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createOrEdit(body: CreateOrEditEventsDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/UserEvents/CreateOrEdit";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json-patch+json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrEdit(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrEdit(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processCreateOrEdit(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    delete(id: number | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/UserEvents/Delete?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    removeImageFile(id: number | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/UserEvents/RemoveImageFile?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processRemoveImageFile(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processRemoveImageFile(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processRemoveImageFile(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 export class ApplicationInfoDto implements IApplicationInfoDto {
@@ -5195,73 +5621,6 @@ export interface IAuthenticateResultModel {
     userId: number;
 }
 
-export class BloodBankDto implements IBloodBankDto {
-    id: number;
-    name: string | undefined;
-    phone: string | undefined;
-    email: string | undefined;
-    logo: string | undefined;
-    logoFileName: string | undefined;
-    address: string | undefined;
-
-    constructor(data?: IBloodBankDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.name = _data["name"];
-            this.phone = _data["phone"];
-            this.email = _data["email"];
-            this.logo = _data["logo"];
-            this.logoFileName = _data["logoFileName"];
-            this.address = _data["address"];
-        }
-    }
-
-    static fromJS(data: any): BloodBankDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new BloodBankDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["name"] = this.name;
-        data["phone"] = this.phone;
-        data["email"] = this.email;
-        data["logo"] = this.logo;
-        data["logoFileName"] = this.logoFileName;
-        data["address"] = this.address;
-        return data;
-    }
-
-    clone(): BloodBankDto {
-        const json = this.toJSON();
-        let result = new BloodBankDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IBloodBankDto {
-    id: number;
-    name: string | undefined;
-    phone: string | undefined;
-    email: string | undefined;
-    logo: string | undefined;
-    logoFileName: string | undefined;
-    address: string | undefined;
-}
-
 export enum BloodGroup {
     _0 = 0,
     _1 = 1,
@@ -5271,61 +5630,6 @@ export enum BloodGroup {
     _5 = 5,
     _6 = 6,
     _7 = 7,
-}
-
-export class BloodStockDto implements IBloodStockDto {
-    id: number;
-    bloodGroup: BloodGroup;
-    inwardQty: number;
-    outwardQty: number;
-
-    constructor(data?: IBloodStockDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.bloodGroup = _data["bloodGroup"];
-            this.inwardQty = _data["inwardQty"];
-            this.outwardQty = _data["outwardQty"];
-        }
-    }
-
-    static fromJS(data: any): BloodStockDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new BloodStockDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["bloodGroup"] = this.bloodGroup;
-        data["inwardQty"] = this.inwardQty;
-        data["outwardQty"] = this.outwardQty;
-        return data;
-    }
-
-    clone(): BloodStockDto {
-        const json = this.toJSON();
-        let result = new BloodStockDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IBloodStockDto {
-    id: number;
-    bloodGroup: BloodGroup;
-    inwardQty: number;
-    outwardQty: number;
 }
 
 export class ChangePasswordDto implements IChangePasswordDto {
@@ -5540,6 +5844,7 @@ export class CreateOrEditBloodBankDto implements ICreateOrEditBloodBankDto {
     logo: string | undefined;
     logoToken: string | undefined;
     address: string | undefined;
+    password: string | undefined;
 
     constructor(data?: ICreateOrEditBloodBankDto) {
         if (data) {
@@ -5559,6 +5864,7 @@ export class CreateOrEditBloodBankDto implements ICreateOrEditBloodBankDto {
             this.logo = _data["logo"];
             this.logoToken = _data["logoToken"];
             this.address = _data["address"];
+            this.password = _data["password"];
         }
     }
 
@@ -5578,6 +5884,7 @@ export class CreateOrEditBloodBankDto implements ICreateOrEditBloodBankDto {
         data["logo"] = this.logo;
         data["logoToken"] = this.logoToken;
         data["address"] = this.address;
+        data["password"] = this.password;
         return data;
     }
 
@@ -5597,6 +5904,7 @@ export interface ICreateOrEditBloodBankDto {
     logo: string | undefined;
     logoToken: string | undefined;
     address: string | undefined;
+    password: string | undefined;
 }
 
 export class CreateOrEditBloodStockDto implements ICreateOrEditBloodStockDto {
@@ -5663,6 +5971,7 @@ export class CreateOrEditDonatedBloodDto implements ICreateOrEditDonatedBloodDto
     donationType: DonationType;
     requestBloodId: number | undefined;
     bloodBankId: number | undefined;
+    donatedTo: string | undefined;
 
     constructor(data?: ICreateOrEditDonatedBloodDto) {
         if (data) {
@@ -5683,6 +5992,7 @@ export class CreateOrEditDonatedBloodDto implements ICreateOrEditDonatedBloodDto
             this.donationType = _data["donationType"];
             this.requestBloodId = _data["requestBloodId"];
             this.bloodBankId = _data["bloodBankId"];
+            this.donatedTo = _data["donatedTo"];
         }
     }
 
@@ -5703,6 +6013,7 @@ export class CreateOrEditDonatedBloodDto implements ICreateOrEditDonatedBloodDto
         data["donationType"] = this.donationType;
         data["requestBloodId"] = this.requestBloodId;
         data["bloodBankId"] = this.bloodBankId;
+        data["donatedTo"] = this.donatedTo;
         return data;
     }
 
@@ -5723,10 +6034,12 @@ export interface ICreateOrEditDonatedBloodDto {
     donationType: DonationType;
     requestBloodId: number | undefined;
     bloodBankId: number | undefined;
+    donatedTo: string | undefined;
 }
 
 export class CreateOrEditDonorDto implements ICreateOrEditDonorDto {
     id: number | undefined;
+    isEligible: boolean;
     bloodGroup: BloodGroup;
     gender: Gender;
     phone: string | undefined;
@@ -5740,6 +6053,10 @@ export class CreateOrEditDonorDto implements ICreateOrEditDonorDto {
     medicine: string | undefined;
     image: string | undefined;
     imageToken: string | undefined;
+    phoneNo: string | undefined;
+    password: string | undefined;
+    lastName: string | undefined;
+    firstName: string | undefined;
 
     constructor(data?: ICreateOrEditDonorDto) {
         if (data) {
@@ -5753,6 +6070,7 @@ export class CreateOrEditDonorDto implements ICreateOrEditDonorDto {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isEligible = _data["isEligible"];
             this.bloodGroup = _data["bloodGroup"];
             this.gender = _data["gender"];
             this.phone = _data["phone"];
@@ -5766,6 +6084,10 @@ export class CreateOrEditDonorDto implements ICreateOrEditDonorDto {
             this.medicine = _data["medicine"];
             this.image = _data["image"];
             this.imageToken = _data["imageToken"];
+            this.phoneNo = _data["phoneNo"];
+            this.password = _data["password"];
+            this.lastName = _data["lastName"];
+            this.firstName = _data["firstName"];
         }
     }
 
@@ -5779,6 +6101,7 @@ export class CreateOrEditDonorDto implements ICreateOrEditDonorDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isEligible"] = this.isEligible;
         data["bloodGroup"] = this.bloodGroup;
         data["gender"] = this.gender;
         data["phone"] = this.phone;
@@ -5792,6 +6115,10 @@ export class CreateOrEditDonorDto implements ICreateOrEditDonorDto {
         data["medicine"] = this.medicine;
         data["image"] = this.image;
         data["imageToken"] = this.imageToken;
+        data["phoneNo"] = this.phoneNo;
+        data["password"] = this.password;
+        data["lastName"] = this.lastName;
+        data["firstName"] = this.firstName;
         return data;
     }
 
@@ -5805,6 +6132,7 @@ export class CreateOrEditDonorDto implements ICreateOrEditDonorDto {
 
 export interface ICreateOrEditDonorDto {
     id: number | undefined;
+    isEligible: boolean;
     bloodGroup: BloodGroup;
     gender: Gender;
     phone: string | undefined;
@@ -5818,6 +6146,10 @@ export interface ICreateOrEditDonorDto {
     medicine: string | undefined;
     image: string | undefined;
     imageToken: string | undefined;
+    phoneNo: string | undefined;
+    password: string | undefined;
+    lastName: string | undefined;
+    firstName: string | undefined;
 }
 
 export class CreateOrEditEventsDto implements ICreateOrEditEventsDto {
@@ -5905,7 +6237,7 @@ export class CreateOrEditRequestBloodDto implements ICreateOrEditRequestBloodDto
     patientName: string | undefined;
     contactPhone: string | undefined;
     contactName: string | undefined;
-    donarId: number;
+    donarId: number | undefined;
     contactEmail: string | undefined;
     date: moment.Moment;
     quantity: number;
@@ -5983,7 +6315,7 @@ export interface ICreateOrEditRequestBloodDto {
     patientName: string | undefined;
     contactPhone: string | undefined;
     contactName: string | undefined;
-    donarId: number;
+    donarId: number | undefined;
     contactEmail: string | undefined;
     date: moment.Moment;
     quantity: number;
@@ -6195,254 +6527,10 @@ export interface ICreateUserDto {
     password: string;
 }
 
-export class DonatedBloodDto implements IDonatedBloodDto {
-    id: number;
-    date: moment.Moment;
-    quantity: number;
-    remarks: string | undefined;
-    donarId: number;
-    donationType: DonationType;
-    requestBloodId: number | undefined;
-    bloodBankId: number | undefined;
-
-    constructor(data?: IDonatedBloodDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
-            this.quantity = _data["quantity"];
-            this.remarks = _data["remarks"];
-            this.donarId = _data["donarId"];
-            this.donationType = _data["donationType"];
-            this.requestBloodId = _data["requestBloodId"];
-            this.bloodBankId = _data["bloodBankId"];
-        }
-    }
-
-    static fromJS(data: any): DonatedBloodDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new DonatedBloodDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
-        data["quantity"] = this.quantity;
-        data["remarks"] = this.remarks;
-        data["donarId"] = this.donarId;
-        data["donationType"] = this.donationType;
-        data["requestBloodId"] = this.requestBloodId;
-        data["bloodBankId"] = this.bloodBankId;
-        return data;
-    }
-
-    clone(): DonatedBloodDto {
-        const json = this.toJSON();
-        let result = new DonatedBloodDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IDonatedBloodDto {
-    id: number;
-    date: moment.Moment;
-    quantity: number;
-    remarks: string | undefined;
-    donarId: number;
-    donationType: DonationType;
-    requestBloodId: number | undefined;
-    bloodBankId: number | undefined;
-}
-
 export enum DonationType {
     _0 = 0,
     _1 = 1,
-}
-
-export class DonorDto implements IDonorDto {
-    id: number;
-    bloodGroup: BloodGroup;
-    gender: Gender;
-    phone: string | undefined;
-    email: string | undefined;
-    location: string | undefined;
-    dob: moment.Moment;
-    weight: number;
-    disease: string | undefined;
-    isSmoking: boolean;
-    isAlcohol: boolean;
-    medicine: string | undefined;
-    image: string | undefined;
-    imageFileName: string | undefined;
-
-    constructor(data?: IDonorDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.bloodGroup = _data["bloodGroup"];
-            this.gender = _data["gender"];
-            this.phone = _data["phone"];
-            this.email = _data["email"];
-            this.location = _data["location"];
-            this.dob = _data["dob"] ? moment(_data["dob"].toString()) : <any>undefined;
-            this.weight = _data["weight"];
-            this.disease = _data["disease"];
-            this.isSmoking = _data["isSmoking"];
-            this.isAlcohol = _data["isAlcohol"];
-            this.medicine = _data["medicine"];
-            this.image = _data["image"];
-            this.imageFileName = _data["imageFileName"];
-        }
-    }
-
-    static fromJS(data: any): DonorDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new DonorDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["bloodGroup"] = this.bloodGroup;
-        data["gender"] = this.gender;
-        data["phone"] = this.phone;
-        data["email"] = this.email;
-        data["location"] = this.location;
-        data["dob"] = this.dob ? this.dob.toISOString() : <any>undefined;
-        data["weight"] = this.weight;
-        data["disease"] = this.disease;
-        data["isSmoking"] = this.isSmoking;
-        data["isAlcohol"] = this.isAlcohol;
-        data["medicine"] = this.medicine;
-        data["image"] = this.image;
-        data["imageFileName"] = this.imageFileName;
-        return data;
-    }
-
-    clone(): DonorDto {
-        const json = this.toJSON();
-        let result = new DonorDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IDonorDto {
-    id: number;
-    bloodGroup: BloodGroup;
-    gender: Gender;
-    phone: string | undefined;
-    email: string | undefined;
-    location: string | undefined;
-    dob: moment.Moment;
-    weight: number;
-    disease: string | undefined;
-    isSmoking: boolean;
-    isAlcohol: boolean;
-    medicine: string | undefined;
-    image: string | undefined;
-    imageFileName: string | undefined;
-}
-
-export class EventsDto implements IEventsDto {
-    id: number;
-    title: string | undefined;
-    description: string | undefined;
-    location: string | undefined;
-    contactNo: string | undefined;
-    date: moment.Moment;
-    time: string | undefined;
-    image: string | undefined;
-    imageFileName: string | undefined;
-    isApproved: boolean;
-
-    constructor(data?: IEventsDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.title = _data["title"];
-            this.description = _data["description"];
-            this.location = _data["location"];
-            this.contactNo = _data["contactNo"];
-            this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
-            this.time = _data["time"];
-            this.image = _data["image"];
-            this.imageFileName = _data["imageFileName"];
-            this.isApproved = _data["isApproved"];
-        }
-    }
-
-    static fromJS(data: any): EventsDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new EventsDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["title"] = this.title;
-        data["description"] = this.description;
-        data["location"] = this.location;
-        data["contactNo"] = this.contactNo;
-        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
-        data["time"] = this.time;
-        data["image"] = this.image;
-        data["imageFileName"] = this.imageFileName;
-        data["isApproved"] = this.isApproved;
-        return data;
-    }
-
-    clone(): EventsDto {
-        const json = this.toJSON();
-        let result = new EventsDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IEventsDto {
-    id: number;
-    title: string | undefined;
-    description: string | undefined;
-    location: string | undefined;
-    contactNo: string | undefined;
-    date: moment.Moment;
-    time: string | undefined;
-    image: string | undefined;
-    imageFileName: string | undefined;
-    isApproved: boolean;
+    _2 = 2,
 }
 
 export class ExternalAuthenticateModel implements IExternalAuthenticateModel {
@@ -6707,7 +6795,14 @@ export enum Gender {
 }
 
 export class GetAmbulanceForEditOutput implements IGetAmbulanceForEditOutput {
-    ambulance: CreateOrEditAmbulanceDto;
+    id: number;
+    name: string | undefined;
+    location: string | undefined;
+    contactPerson: string | undefined;
+    ambulanceNumber: string | undefined;
+    phoneNo1: string | undefined;
+    phoneNo2: string | undefined;
+    isApproved: boolean;
 
     constructor(data?: IGetAmbulanceForEditOutput) {
         if (data) {
@@ -6720,7 +6815,14 @@ export class GetAmbulanceForEditOutput implements IGetAmbulanceForEditOutput {
 
     init(_data?: any) {
         if (_data) {
-            this.ambulance = _data["ambulance"] ? CreateOrEditAmbulanceDto.fromJS(_data["ambulance"]) : <any>undefined;
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.location = _data["location"];
+            this.contactPerson = _data["contactPerson"];
+            this.ambulanceNumber = _data["ambulanceNumber"];
+            this.phoneNo1 = _data["phoneNo1"];
+            this.phoneNo2 = _data["phoneNo2"];
+            this.isApproved = _data["isApproved"];
         }
     }
 
@@ -6733,7 +6835,14 @@ export class GetAmbulanceForEditOutput implements IGetAmbulanceForEditOutput {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["ambulance"] = this.ambulance ? this.ambulance.toJSON() : <any>undefined;
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["location"] = this.location;
+        data["contactPerson"] = this.contactPerson;
+        data["ambulanceNumber"] = this.ambulanceNumber;
+        data["phoneNo1"] = this.phoneNo1;
+        data["phoneNo2"] = this.phoneNo2;
+        data["isApproved"] = this.isApproved;
         return data;
     }
 
@@ -6746,11 +6855,25 @@ export class GetAmbulanceForEditOutput implements IGetAmbulanceForEditOutput {
 }
 
 export interface IGetAmbulanceForEditOutput {
-    ambulance: CreateOrEditAmbulanceDto;
+    id: number;
+    name: string | undefined;
+    location: string | undefined;
+    contactPerson: string | undefined;
+    ambulanceNumber: string | undefined;
+    phoneNo1: string | undefined;
+    phoneNo2: string | undefined;
+    isApproved: boolean;
 }
 
 export class GetAmbulanceForViewDto implements IGetAmbulanceForViewDto {
-    ambulance: AmbulanceDto;
+    id: number;
+    name: string | undefined;
+    location: string | undefined;
+    contactPerson: string | undefined;
+    ambulanceNumber: string | undefined;
+    phoneNo1: string | undefined;
+    phoneNo2: string | undefined;
+    isApproved: boolean;
 
     constructor(data?: IGetAmbulanceForViewDto) {
         if (data) {
@@ -6763,7 +6886,14 @@ export class GetAmbulanceForViewDto implements IGetAmbulanceForViewDto {
 
     init(_data?: any) {
         if (_data) {
-            this.ambulance = _data["ambulance"] ? AmbulanceDto.fromJS(_data["ambulance"]) : <any>undefined;
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.location = _data["location"];
+            this.contactPerson = _data["contactPerson"];
+            this.ambulanceNumber = _data["ambulanceNumber"];
+            this.phoneNo1 = _data["phoneNo1"];
+            this.phoneNo2 = _data["phoneNo2"];
+            this.isApproved = _data["isApproved"];
         }
     }
 
@@ -6776,7 +6906,14 @@ export class GetAmbulanceForViewDto implements IGetAmbulanceForViewDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["ambulance"] = this.ambulance ? this.ambulance.toJSON() : <any>undefined;
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["location"] = this.location;
+        data["contactPerson"] = this.contactPerson;
+        data["ambulanceNumber"] = this.ambulanceNumber;
+        data["phoneNo1"] = this.phoneNo1;
+        data["phoneNo2"] = this.phoneNo2;
+        data["isApproved"] = this.isApproved;
         return data;
     }
 
@@ -6789,7 +6926,14 @@ export class GetAmbulanceForViewDto implements IGetAmbulanceForViewDto {
 }
 
 export interface IGetAmbulanceForViewDto {
-    ambulance: AmbulanceDto;
+    id: number;
+    name: string | undefined;
+    location: string | undefined;
+    contactPerson: string | undefined;
+    ambulanceNumber: string | undefined;
+    phoneNo1: string | undefined;
+    phoneNo2: string | undefined;
+    isApproved: boolean;
 }
 
 export class GetAmbulanceForViewDtoPagedResultDto implements IGetAmbulanceForViewDtoPagedResultDto {
@@ -6848,8 +6992,14 @@ export interface IGetAmbulanceForViewDtoPagedResultDto {
 }
 
 export class GetBloodBankForEditOutput implements IGetBloodBankForEditOutput {
-    bloodBank: CreateOrEditBloodBankDto;
+    id: number;
+    name: string | undefined;
+    phone: string | undefined;
+    email: string | undefined;
+    logo: string | undefined;
+    logoBytes: string | undefined;
     logoFileName: string | undefined;
+    address: string | undefined;
 
     constructor(data?: IGetBloodBankForEditOutput) {
         if (data) {
@@ -6862,8 +7012,14 @@ export class GetBloodBankForEditOutput implements IGetBloodBankForEditOutput {
 
     init(_data?: any) {
         if (_data) {
-            this.bloodBank = _data["bloodBank"] ? CreateOrEditBloodBankDto.fromJS(_data["bloodBank"]) : <any>undefined;
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.phone = _data["phone"];
+            this.email = _data["email"];
+            this.logo = _data["logo"];
+            this.logoBytes = _data["logoBytes"];
             this.logoFileName = _data["logoFileName"];
+            this.address = _data["address"];
         }
     }
 
@@ -6876,8 +7032,14 @@ export class GetBloodBankForEditOutput implements IGetBloodBankForEditOutput {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["bloodBank"] = this.bloodBank ? this.bloodBank.toJSON() : <any>undefined;
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["phone"] = this.phone;
+        data["email"] = this.email;
+        data["logo"] = this.logo;
+        data["logoBytes"] = this.logoBytes;
         data["logoFileName"] = this.logoFileName;
+        data["address"] = this.address;
         return data;
     }
 
@@ -6890,12 +7052,24 @@ export class GetBloodBankForEditOutput implements IGetBloodBankForEditOutput {
 }
 
 export interface IGetBloodBankForEditOutput {
-    bloodBank: CreateOrEditBloodBankDto;
+    id: number;
+    name: string | undefined;
+    phone: string | undefined;
+    email: string | undefined;
+    logo: string | undefined;
+    logoBytes: string | undefined;
     logoFileName: string | undefined;
+    address: string | undefined;
 }
 
 export class GetBloodBankForViewDto implements IGetBloodBankForViewDto {
-    bloodBank: BloodBankDto;
+    id: number;
+    name: string | undefined;
+    phone: string | undefined;
+    email: string | undefined;
+    logo: string | undefined;
+    logoFileName: string | undefined;
+    address: string | undefined;
 
     constructor(data?: IGetBloodBankForViewDto) {
         if (data) {
@@ -6908,7 +7082,13 @@ export class GetBloodBankForViewDto implements IGetBloodBankForViewDto {
 
     init(_data?: any) {
         if (_data) {
-            this.bloodBank = _data["bloodBank"] ? BloodBankDto.fromJS(_data["bloodBank"]) : <any>undefined;
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.phone = _data["phone"];
+            this.email = _data["email"];
+            this.logo = _data["logo"];
+            this.logoFileName = _data["logoFileName"];
+            this.address = _data["address"];
         }
     }
 
@@ -6921,7 +7101,13 @@ export class GetBloodBankForViewDto implements IGetBloodBankForViewDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["bloodBank"] = this.bloodBank ? this.bloodBank.toJSON() : <any>undefined;
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["phone"] = this.phone;
+        data["email"] = this.email;
+        data["logo"] = this.logo;
+        data["logoFileName"] = this.logoFileName;
+        data["address"] = this.address;
         return data;
     }
 
@@ -6934,7 +7120,13 @@ export class GetBloodBankForViewDto implements IGetBloodBankForViewDto {
 }
 
 export interface IGetBloodBankForViewDto {
-    bloodBank: BloodBankDto;
+    id: number;
+    name: string | undefined;
+    phone: string | undefined;
+    email: string | undefined;
+    logo: string | undefined;
+    logoFileName: string | undefined;
+    address: string | undefined;
 }
 
 export class GetBloodBankForViewDtoPagedResultDto implements IGetBloodBankForViewDtoPagedResultDto {
@@ -6993,7 +7185,11 @@ export interface IGetBloodBankForViewDtoPagedResultDto {
 }
 
 export class GetBloodStockForEditOutput implements IGetBloodStockForEditOutput {
-    bloodStock: CreateOrEditBloodStockDto;
+    id: number;
+    bloodGroup: BloodGroup;
+    inwardQty: number;
+    outwardQty: number;
+    bloodBankId: number;
 
     constructor(data?: IGetBloodStockForEditOutput) {
         if (data) {
@@ -7006,7 +7202,11 @@ export class GetBloodStockForEditOutput implements IGetBloodStockForEditOutput {
 
     init(_data?: any) {
         if (_data) {
-            this.bloodStock = _data["bloodStock"] ? CreateOrEditBloodStockDto.fromJS(_data["bloodStock"]) : <any>undefined;
+            this.id = _data["id"];
+            this.bloodGroup = _data["bloodGroup"];
+            this.inwardQty = _data["inwardQty"];
+            this.outwardQty = _data["outwardQty"];
+            this.bloodBankId = _data["bloodBankId"];
         }
     }
 
@@ -7019,7 +7219,11 @@ export class GetBloodStockForEditOutput implements IGetBloodStockForEditOutput {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["bloodStock"] = this.bloodStock ? this.bloodStock.toJSON() : <any>undefined;
+        data["id"] = this.id;
+        data["bloodGroup"] = this.bloodGroup;
+        data["inwardQty"] = this.inwardQty;
+        data["outwardQty"] = this.outwardQty;
+        data["bloodBankId"] = this.bloodBankId;
         return data;
     }
 
@@ -7032,11 +7236,19 @@ export class GetBloodStockForEditOutput implements IGetBloodStockForEditOutput {
 }
 
 export interface IGetBloodStockForEditOutput {
-    bloodStock: CreateOrEditBloodStockDto;
+    id: number;
+    bloodGroup: BloodGroup;
+    inwardQty: number;
+    outwardQty: number;
+    bloodBankId: number;
 }
 
 export class GetBloodStockForViewDto implements IGetBloodStockForViewDto {
-    bloodStock: BloodStockDto;
+    id: number;
+    bloodGroup: BloodGroup;
+    inwardQty: number;
+    outwardQty: number;
+    bloodBankName: string | undefined;
 
     constructor(data?: IGetBloodStockForViewDto) {
         if (data) {
@@ -7049,7 +7261,11 @@ export class GetBloodStockForViewDto implements IGetBloodStockForViewDto {
 
     init(_data?: any) {
         if (_data) {
-            this.bloodStock = _data["bloodStock"] ? BloodStockDto.fromJS(_data["bloodStock"]) : <any>undefined;
+            this.id = _data["id"];
+            this.bloodGroup = _data["bloodGroup"];
+            this.inwardQty = _data["inwardQty"];
+            this.outwardQty = _data["outwardQty"];
+            this.bloodBankName = _data["bloodBankName"];
         }
     }
 
@@ -7062,7 +7278,11 @@ export class GetBloodStockForViewDto implements IGetBloodStockForViewDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["bloodStock"] = this.bloodStock ? this.bloodStock.toJSON() : <any>undefined;
+        data["id"] = this.id;
+        data["bloodGroup"] = this.bloodGroup;
+        data["inwardQty"] = this.inwardQty;
+        data["outwardQty"] = this.outwardQty;
+        data["bloodBankName"] = this.bloodBankName;
         return data;
     }
 
@@ -7075,7 +7295,11 @@ export class GetBloodStockForViewDto implements IGetBloodStockForViewDto {
 }
 
 export interface IGetBloodStockForViewDto {
-    bloodStock: BloodStockDto;
+    id: number;
+    bloodGroup: BloodGroup;
+    inwardQty: number;
+    outwardQty: number;
+    bloodBankName: string | undefined;
 }
 
 export class GetBloodStockForViewDtoPagedResultDto implements IGetBloodStockForViewDtoPagedResultDto {
@@ -7185,7 +7409,15 @@ export interface IGetCurrentLoginInformationsOutput {
 }
 
 export class GetDonatedBloodForEditOutput implements IGetDonatedBloodForEditOutput {
-    donatedBlood: CreateOrEditDonatedBloodDto;
+    id: number;
+    date: moment.Moment;
+    quantity: number;
+    remarks: string | undefined;
+    donarId: number;
+    donationType: DonationType;
+    requestBloodId: number | undefined;
+    bloodBankId: number | undefined;
+    donatedTo: string | undefined;
 
     constructor(data?: IGetDonatedBloodForEditOutput) {
         if (data) {
@@ -7198,7 +7430,15 @@ export class GetDonatedBloodForEditOutput implements IGetDonatedBloodForEditOutp
 
     init(_data?: any) {
         if (_data) {
-            this.donatedBlood = _data["donatedBlood"] ? CreateOrEditDonatedBloodDto.fromJS(_data["donatedBlood"]) : <any>undefined;
+            this.id = _data["id"];
+            this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
+            this.quantity = _data["quantity"];
+            this.remarks = _data["remarks"];
+            this.donarId = _data["donarId"];
+            this.donationType = _data["donationType"];
+            this.requestBloodId = _data["requestBloodId"];
+            this.bloodBankId = _data["bloodBankId"];
+            this.donatedTo = _data["donatedTo"];
         }
     }
 
@@ -7211,7 +7451,15 @@ export class GetDonatedBloodForEditOutput implements IGetDonatedBloodForEditOutp
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["donatedBlood"] = this.donatedBlood ? this.donatedBlood.toJSON() : <any>undefined;
+        data["id"] = this.id;
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["quantity"] = this.quantity;
+        data["remarks"] = this.remarks;
+        data["donarId"] = this.donarId;
+        data["donationType"] = this.donationType;
+        data["requestBloodId"] = this.requestBloodId;
+        data["bloodBankId"] = this.bloodBankId;
+        data["donatedTo"] = this.donatedTo;
         return data;
     }
 
@@ -7224,11 +7472,25 @@ export class GetDonatedBloodForEditOutput implements IGetDonatedBloodForEditOutp
 }
 
 export interface IGetDonatedBloodForEditOutput {
-    donatedBlood: CreateOrEditDonatedBloodDto;
+    id: number;
+    date: moment.Moment;
+    quantity: number;
+    remarks: string | undefined;
+    donarId: number;
+    donationType: DonationType;
+    requestBloodId: number | undefined;
+    bloodBankId: number | undefined;
+    donatedTo: string | undefined;
 }
 
 export class GetDonatedBloodForViewDto implements IGetDonatedBloodForViewDto {
-    donatedBlood: DonatedBloodDto;
+    id: number;
+    date: moment.Moment;
+    quantity: number;
+    remarks: string | undefined;
+    donar: string | undefined;
+    donationType: DonationType;
+    receiver: string | undefined;
 
     constructor(data?: IGetDonatedBloodForViewDto) {
         if (data) {
@@ -7241,7 +7503,13 @@ export class GetDonatedBloodForViewDto implements IGetDonatedBloodForViewDto {
 
     init(_data?: any) {
         if (_data) {
-            this.donatedBlood = _data["donatedBlood"] ? DonatedBloodDto.fromJS(_data["donatedBlood"]) : <any>undefined;
+            this.id = _data["id"];
+            this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
+            this.quantity = _data["quantity"];
+            this.remarks = _data["remarks"];
+            this.donar = _data["donar"];
+            this.donationType = _data["donationType"];
+            this.receiver = _data["receiver"];
         }
     }
 
@@ -7254,7 +7522,13 @@ export class GetDonatedBloodForViewDto implements IGetDonatedBloodForViewDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["donatedBlood"] = this.donatedBlood ? this.donatedBlood.toJSON() : <any>undefined;
+        data["id"] = this.id;
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["quantity"] = this.quantity;
+        data["remarks"] = this.remarks;
+        data["donar"] = this.donar;
+        data["donationType"] = this.donationType;
+        data["receiver"] = this.receiver;
         return data;
     }
 
@@ -7267,7 +7541,13 @@ export class GetDonatedBloodForViewDto implements IGetDonatedBloodForViewDto {
 }
 
 export interface IGetDonatedBloodForViewDto {
-    donatedBlood: DonatedBloodDto;
+    id: number;
+    date: moment.Moment;
+    quantity: number;
+    remarks: string | undefined;
+    donar: string | undefined;
+    donationType: DonationType;
+    receiver: string | undefined;
 }
 
 export class GetDonatedBloodForViewDtoPagedResultDto implements IGetDonatedBloodForViewDtoPagedResultDto {
@@ -7326,8 +7606,22 @@ export interface IGetDonatedBloodForViewDtoPagedResultDto {
 }
 
 export class GetDonorForEditOutput implements IGetDonorForEditOutput {
-    donor: CreateOrEditDonorDto;
+    bloodGroup: BloodGroup;
+    gender: Gender;
+    phone: string | undefined;
+    email: string | undefined;
+    location: string | undefined;
+    dob: moment.Moment;
+    weight: number;
+    disease: string | undefined;
+    isSmoking: boolean;
+    isAlcohol: boolean;
+    medicine: string | undefined;
+    image: string | undefined;
+    imageBytes: string | undefined;
     imageFileName: string | undefined;
+    firstName: string | undefined;
+    lastName: string | undefined;
 
     constructor(data?: IGetDonorForEditOutput) {
         if (data) {
@@ -7340,8 +7634,22 @@ export class GetDonorForEditOutput implements IGetDonorForEditOutput {
 
     init(_data?: any) {
         if (_data) {
-            this.donor = _data["donor"] ? CreateOrEditDonorDto.fromJS(_data["donor"]) : <any>undefined;
+            this.bloodGroup = _data["bloodGroup"];
+            this.gender = _data["gender"];
+            this.phone = _data["phone"];
+            this.email = _data["email"];
+            this.location = _data["location"];
+            this.dob = _data["dob"] ? moment(_data["dob"].toString()) : <any>undefined;
+            this.weight = _data["weight"];
+            this.disease = _data["disease"];
+            this.isSmoking = _data["isSmoking"];
+            this.isAlcohol = _data["isAlcohol"];
+            this.medicine = _data["medicine"];
+            this.image = _data["image"];
+            this.imageBytes = _data["imageBytes"];
             this.imageFileName = _data["imageFileName"];
+            this.firstName = _data["firstName"];
+            this.lastName = _data["lastName"];
         }
     }
 
@@ -7354,8 +7662,22 @@ export class GetDonorForEditOutput implements IGetDonorForEditOutput {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["donor"] = this.donor ? this.donor.toJSON() : <any>undefined;
+        data["bloodGroup"] = this.bloodGroup;
+        data["gender"] = this.gender;
+        data["phone"] = this.phone;
+        data["email"] = this.email;
+        data["location"] = this.location;
+        data["dob"] = this.dob ? this.dob.toISOString() : <any>undefined;
+        data["weight"] = this.weight;
+        data["disease"] = this.disease;
+        data["isSmoking"] = this.isSmoking;
+        data["isAlcohol"] = this.isAlcohol;
+        data["medicine"] = this.medicine;
+        data["image"] = this.image;
+        data["imageBytes"] = this.imageBytes;
         data["imageFileName"] = this.imageFileName;
+        data["firstName"] = this.firstName;
+        data["lastName"] = this.lastName;
         return data;
     }
 
@@ -7368,12 +7690,38 @@ export class GetDonorForEditOutput implements IGetDonorForEditOutput {
 }
 
 export interface IGetDonorForEditOutput {
-    donor: CreateOrEditDonorDto;
+    bloodGroup: BloodGroup;
+    gender: Gender;
+    phone: string | undefined;
+    email: string | undefined;
+    location: string | undefined;
+    dob: moment.Moment;
+    weight: number;
+    disease: string | undefined;
+    isSmoking: boolean;
+    isAlcohol: boolean;
+    medicine: string | undefined;
+    image: string | undefined;
+    imageBytes: string | undefined;
     imageFileName: string | undefined;
+    firstName: string | undefined;
+    lastName: string | undefined;
 }
 
 export class GetDonorForViewDto implements IGetDonorForViewDto {
-    donor: DonorDto;
+    id: number;
+    bloodGroup: BloodGroup;
+    gender: Gender;
+    phone: string | undefined;
+    email: string | undefined;
+    location: string | undefined;
+    dob: moment.Moment;
+    weight: number;
+    disease: string | undefined;
+    isSmoking: boolean;
+    isAlcohol: boolean;
+    medicine: string | undefined;
+    fullName: string | undefined;
 
     constructor(data?: IGetDonorForViewDto) {
         if (data) {
@@ -7386,7 +7734,19 @@ export class GetDonorForViewDto implements IGetDonorForViewDto {
 
     init(_data?: any) {
         if (_data) {
-            this.donor = _data["donor"] ? DonorDto.fromJS(_data["donor"]) : <any>undefined;
+            this.id = _data["id"];
+            this.bloodGroup = _data["bloodGroup"];
+            this.gender = _data["gender"];
+            this.phone = _data["phone"];
+            this.email = _data["email"];
+            this.location = _data["location"];
+            this.dob = _data["dob"] ? moment(_data["dob"].toString()) : <any>undefined;
+            this.weight = _data["weight"];
+            this.disease = _data["disease"];
+            this.isSmoking = _data["isSmoking"];
+            this.isAlcohol = _data["isAlcohol"];
+            this.medicine = _data["medicine"];
+            this.fullName = _data["fullName"];
         }
     }
 
@@ -7399,7 +7759,19 @@ export class GetDonorForViewDto implements IGetDonorForViewDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["donor"] = this.donor ? this.donor.toJSON() : <any>undefined;
+        data["id"] = this.id;
+        data["bloodGroup"] = this.bloodGroup;
+        data["gender"] = this.gender;
+        data["phone"] = this.phone;
+        data["email"] = this.email;
+        data["location"] = this.location;
+        data["dob"] = this.dob ? this.dob.toISOString() : <any>undefined;
+        data["weight"] = this.weight;
+        data["disease"] = this.disease;
+        data["isSmoking"] = this.isSmoking;
+        data["isAlcohol"] = this.isAlcohol;
+        data["medicine"] = this.medicine;
+        data["fullName"] = this.fullName;
         return data;
     }
 
@@ -7412,7 +7784,19 @@ export class GetDonorForViewDto implements IGetDonorForViewDto {
 }
 
 export interface IGetDonorForViewDto {
-    donor: DonorDto;
+    id: number;
+    bloodGroup: BloodGroup;
+    gender: Gender;
+    phone: string | undefined;
+    email: string | undefined;
+    location: string | undefined;
+    dob: moment.Moment;
+    weight: number;
+    disease: string | undefined;
+    isSmoking: boolean;
+    isAlcohol: boolean;
+    medicine: string | undefined;
+    fullName: string | undefined;
 }
 
 export class GetDonorForViewDtoPagedResultDto implements IGetDonorForViewDtoPagedResultDto {
@@ -7471,8 +7855,17 @@ export interface IGetDonorForViewDtoPagedResultDto {
 }
 
 export class GetEventsForEditOutput implements IGetEventsForEditOutput {
-    events: CreateOrEditEventsDto;
+    id: number;
+    title: string | undefined;
+    description: string | undefined;
+    location: string | undefined;
+    contactNo: string | undefined;
+    date: moment.Moment;
+    time: string | undefined;
+    image: string | undefined;
+    imageBytes: string | undefined;
     imageFileName: string | undefined;
+    isApproved: boolean;
 
     constructor(data?: IGetEventsForEditOutput) {
         if (data) {
@@ -7485,8 +7878,17 @@ export class GetEventsForEditOutput implements IGetEventsForEditOutput {
 
     init(_data?: any) {
         if (_data) {
-            this.events = _data["events"] ? CreateOrEditEventsDto.fromJS(_data["events"]) : <any>undefined;
+            this.id = _data["id"];
+            this.title = _data["title"];
+            this.description = _data["description"];
+            this.location = _data["location"];
+            this.contactNo = _data["contactNo"];
+            this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
+            this.time = _data["time"];
+            this.image = _data["image"];
+            this.imageBytes = _data["imageBytes"];
             this.imageFileName = _data["imageFileName"];
+            this.isApproved = _data["isApproved"];
         }
     }
 
@@ -7499,8 +7901,17 @@ export class GetEventsForEditOutput implements IGetEventsForEditOutput {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["events"] = this.events ? this.events.toJSON() : <any>undefined;
+        data["id"] = this.id;
+        data["title"] = this.title;
+        data["description"] = this.description;
+        data["location"] = this.location;
+        data["contactNo"] = this.contactNo;
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["time"] = this.time;
+        data["image"] = this.image;
+        data["imageBytes"] = this.imageBytes;
         data["imageFileName"] = this.imageFileName;
+        data["isApproved"] = this.isApproved;
         return data;
     }
 
@@ -7513,12 +7924,29 @@ export class GetEventsForEditOutput implements IGetEventsForEditOutput {
 }
 
 export interface IGetEventsForEditOutput {
-    events: CreateOrEditEventsDto;
+    id: number;
+    title: string | undefined;
+    description: string | undefined;
+    location: string | undefined;
+    contactNo: string | undefined;
+    date: moment.Moment;
+    time: string | undefined;
+    image: string | undefined;
+    imageBytes: string | undefined;
     imageFileName: string | undefined;
+    isApproved: boolean;
 }
 
 export class GetEventsForViewDto implements IGetEventsForViewDto {
-    events: EventsDto;
+    id: number;
+    title: string | undefined;
+    description: string | undefined;
+    location: string | undefined;
+    contactNo: string | undefined;
+    date: moment.Moment;
+    time: string | undefined;
+    isApproved: boolean;
+    readonly fullName: string | undefined;
 
     constructor(data?: IGetEventsForViewDto) {
         if (data) {
@@ -7531,7 +7959,15 @@ export class GetEventsForViewDto implements IGetEventsForViewDto {
 
     init(_data?: any) {
         if (_data) {
-            this.events = _data["events"] ? EventsDto.fromJS(_data["events"]) : <any>undefined;
+            this.id = _data["id"];
+            this.title = _data["title"];
+            this.description = _data["description"];
+            this.location = _data["location"];
+            this.contactNo = _data["contactNo"];
+            this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
+            this.time = _data["time"];
+            this.isApproved = _data["isApproved"];
+            (<any>this).fullName = _data["fullName"];
         }
     }
 
@@ -7544,7 +7980,15 @@ export class GetEventsForViewDto implements IGetEventsForViewDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["events"] = this.events ? this.events.toJSON() : <any>undefined;
+        data["id"] = this.id;
+        data["title"] = this.title;
+        data["description"] = this.description;
+        data["location"] = this.location;
+        data["contactNo"] = this.contactNo;
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["time"] = this.time;
+        data["isApproved"] = this.isApproved;
+        data["fullName"] = this.fullName;
         return data;
     }
 
@@ -7557,7 +8001,15 @@ export class GetEventsForViewDto implements IGetEventsForViewDto {
 }
 
 export interface IGetEventsForViewDto {
-    events: EventsDto;
+    id: number;
+    title: string | undefined;
+    description: string | undefined;
+    location: string | undefined;
+    contactNo: string | undefined;
+    date: moment.Moment;
+    time: string | undefined;
+    isApproved: boolean;
+    fullName: string | undefined;
 }
 
 export class GetEventsForViewDtoPagedResultDto implements IGetEventsForViewDtoPagedResultDto {
@@ -7616,7 +8068,20 @@ export interface IGetEventsForViewDtoPagedResultDto {
 }
 
 export class GetRequestBloodForEditOutput implements IGetRequestBloodForEditOutput {
-    requestBlood: CreateOrEditRequestBloodDto;
+    id: number;
+    bloodGroup: BloodGroup;
+    patientName: string | undefined;
+    contactPhone: string | undefined;
+    contactName: string | undefined;
+    donarId: number;
+    contactEmail: string | undefined;
+    date: moment.Moment;
+    quantity: number;
+    hospital: string | undefined;
+    time: string | undefined;
+    caseDetail: string | undefined;
+    location: string | undefined;
+    isDelivered: boolean;
 
     constructor(data?: IGetRequestBloodForEditOutput) {
         if (data) {
@@ -7629,7 +8094,20 @@ export class GetRequestBloodForEditOutput implements IGetRequestBloodForEditOutp
 
     init(_data?: any) {
         if (_data) {
-            this.requestBlood = _data["requestBlood"] ? CreateOrEditRequestBloodDto.fromJS(_data["requestBlood"]) : <any>undefined;
+            this.id = _data["id"];
+            this.bloodGroup = _data["bloodGroup"];
+            this.patientName = _data["patientName"];
+            this.contactPhone = _data["contactPhone"];
+            this.contactName = _data["contactName"];
+            this.donarId = _data["donarId"];
+            this.contactEmail = _data["contactEmail"];
+            this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
+            this.quantity = _data["quantity"];
+            this.hospital = _data["hospital"];
+            this.time = _data["time"];
+            this.caseDetail = _data["caseDetail"];
+            this.location = _data["location"];
+            this.isDelivered = _data["isDelivered"];
         }
     }
 
@@ -7642,7 +8120,20 @@ export class GetRequestBloodForEditOutput implements IGetRequestBloodForEditOutp
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["requestBlood"] = this.requestBlood ? this.requestBlood.toJSON() : <any>undefined;
+        data["id"] = this.id;
+        data["bloodGroup"] = this.bloodGroup;
+        data["patientName"] = this.patientName;
+        data["contactPhone"] = this.contactPhone;
+        data["contactName"] = this.contactName;
+        data["donarId"] = this.donarId;
+        data["contactEmail"] = this.contactEmail;
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["quantity"] = this.quantity;
+        data["hospital"] = this.hospital;
+        data["time"] = this.time;
+        data["caseDetail"] = this.caseDetail;
+        data["location"] = this.location;
+        data["isDelivered"] = this.isDelivered;
         return data;
     }
 
@@ -7655,11 +8146,37 @@ export class GetRequestBloodForEditOutput implements IGetRequestBloodForEditOutp
 }
 
 export interface IGetRequestBloodForEditOutput {
-    requestBlood: CreateOrEditRequestBloodDto;
+    id: number;
+    bloodGroup: BloodGroup;
+    patientName: string | undefined;
+    contactPhone: string | undefined;
+    contactName: string | undefined;
+    donarId: number;
+    contactEmail: string | undefined;
+    date: moment.Moment;
+    quantity: number;
+    hospital: string | undefined;
+    time: string | undefined;
+    caseDetail: string | undefined;
+    location: string | undefined;
+    isDelivered: boolean;
 }
 
 export class GetRequestBloodForViewDto implements IGetRequestBloodForViewDto {
-    requestBlood: RequestBloodDto;
+    id: number;
+    bloodGroup: BloodGroup;
+    patientName: string | undefined;
+    contactPhone: string | undefined;
+    contactName: string | undefined;
+    donarName: string | undefined;
+    contactEmail: string | undefined;
+    date: moment.Moment;
+    quantity: number;
+    hospital: string | undefined;
+    time: string | undefined;
+    caseDetail: string | undefined;
+    location: string | undefined;
+    isDelivered: boolean;
 
     constructor(data?: IGetRequestBloodForViewDto) {
         if (data) {
@@ -7672,7 +8189,20 @@ export class GetRequestBloodForViewDto implements IGetRequestBloodForViewDto {
 
     init(_data?: any) {
         if (_data) {
-            this.requestBlood = _data["requestBlood"] ? RequestBloodDto.fromJS(_data["requestBlood"]) : <any>undefined;
+            this.id = _data["id"];
+            this.bloodGroup = _data["bloodGroup"];
+            this.patientName = _data["patientName"];
+            this.contactPhone = _data["contactPhone"];
+            this.contactName = _data["contactName"];
+            this.donarName = _data["donarName"];
+            this.contactEmail = _data["contactEmail"];
+            this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
+            this.quantity = _data["quantity"];
+            this.hospital = _data["hospital"];
+            this.time = _data["time"];
+            this.caseDetail = _data["caseDetail"];
+            this.location = _data["location"];
+            this.isDelivered = _data["isDelivered"];
         }
     }
 
@@ -7685,7 +8215,20 @@ export class GetRequestBloodForViewDto implements IGetRequestBloodForViewDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
-        data["requestBlood"] = this.requestBlood ? this.requestBlood.toJSON() : <any>undefined;
+        data["id"] = this.id;
+        data["bloodGroup"] = this.bloodGroup;
+        data["patientName"] = this.patientName;
+        data["contactPhone"] = this.contactPhone;
+        data["contactName"] = this.contactName;
+        data["donarName"] = this.donarName;
+        data["contactEmail"] = this.contactEmail;
+        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
+        data["quantity"] = this.quantity;
+        data["hospital"] = this.hospital;
+        data["time"] = this.time;
+        data["caseDetail"] = this.caseDetail;
+        data["location"] = this.location;
+        data["isDelivered"] = this.isDelivered;
         return data;
     }
 
@@ -7698,7 +8241,20 @@ export class GetRequestBloodForViewDto implements IGetRequestBloodForViewDto {
 }
 
 export interface IGetRequestBloodForViewDto {
-    requestBlood: RequestBloodDto;
+    id: number;
+    bloodGroup: BloodGroup;
+    patientName: string | undefined;
+    contactPhone: string | undefined;
+    contactName: string | undefined;
+    donarName: string | undefined;
+    contactEmail: string | undefined;
+    date: moment.Moment;
+    quantity: number;
+    hospital: string | undefined;
+    time: string | undefined;
+    caseDetail: string | undefined;
+    location: string | undefined;
+    isDelivered: boolean;
 }
 
 export class GetRequestBloodForViewDtoPagedResultDto implements IGetRequestBloodForViewDtoPagedResultDto {
@@ -8166,101 +8722,6 @@ export class RegisterOutput implements IRegisterOutput {
 
 export interface IRegisterOutput {
     canLogin: boolean;
-}
-
-export class RequestBloodDto implements IRequestBloodDto {
-    id: number;
-    bloodGroup: BloodGroup;
-    patientName: string | undefined;
-    contactPhone: string | undefined;
-    contactName: string | undefined;
-    donarId: number;
-    contactEmail: string | undefined;
-    date: moment.Moment;
-    quantity: number;
-    hospital: string | undefined;
-    time: string | undefined;
-    caseDetail: string | undefined;
-    location: string | undefined;
-    isDelivered: boolean;
-
-    constructor(data?: IRequestBloodDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.bloodGroup = _data["bloodGroup"];
-            this.patientName = _data["patientName"];
-            this.contactPhone = _data["contactPhone"];
-            this.contactName = _data["contactName"];
-            this.donarId = _data["donarId"];
-            this.contactEmail = _data["contactEmail"];
-            this.date = _data["date"] ? moment(_data["date"].toString()) : <any>undefined;
-            this.quantity = _data["quantity"];
-            this.hospital = _data["hospital"];
-            this.time = _data["time"];
-            this.caseDetail = _data["caseDetail"];
-            this.location = _data["location"];
-            this.isDelivered = _data["isDelivered"];
-        }
-    }
-
-    static fromJS(data: any): RequestBloodDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new RequestBloodDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["bloodGroup"] = this.bloodGroup;
-        data["patientName"] = this.patientName;
-        data["contactPhone"] = this.contactPhone;
-        data["contactName"] = this.contactName;
-        data["donarId"] = this.donarId;
-        data["contactEmail"] = this.contactEmail;
-        data["date"] = this.date ? this.date.toISOString() : <any>undefined;
-        data["quantity"] = this.quantity;
-        data["hospital"] = this.hospital;
-        data["time"] = this.time;
-        data["caseDetail"] = this.caseDetail;
-        data["location"] = this.location;
-        data["isDelivered"] = this.isDelivered;
-        return data;
-    }
-
-    clone(): RequestBloodDto {
-        const json = this.toJSON();
-        let result = new RequestBloodDto();
-        result.init(json);
-        return result;
-    }
-}
-
-export interface IRequestBloodDto {
-    id: number;
-    bloodGroup: BloodGroup;
-    patientName: string | undefined;
-    contactPhone: string | undefined;
-    contactName: string | undefined;
-    donarId: number;
-    contactEmail: string | undefined;
-    date: moment.Moment;
-    quantity: number;
-    hospital: string | undefined;
-    time: string | undefined;
-    caseDetail: string | undefined;
-    location: string | undefined;
-    isDelivered: boolean;
 }
 
 export class ResetPasswordDto implements IResetPasswordDto {
